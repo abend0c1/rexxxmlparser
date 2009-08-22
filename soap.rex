@@ -100,7 +100,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **                        XML   - Display messages contents in XML   **
 **                        NOPROXY - Do not use proxy host.           **
 **                                                                   **
-** AUTHOR   - Andrew J. Armstrong <andrew_armstrong@unwired.com.au>  **
+** AUTHOR   - Andrew J. Armstrong <androidarmstrong+sf@gmail.com>    **
 **                                                                   **
 ** HISTORY  - Date     By  Reason (most recent at the top please)    **
 **            -------- --- ----------------------------------------- **

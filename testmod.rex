@@ -59,7 +59,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **               testmodp infile outfile                             **
 **                                                                   **
 **                                                                   **
-** AUTHOR   - Andrew J. Armstrong <andrew_armstrong@unwired.com.au>  **
+** AUTHOR   - Andrew J. Armstrong <androidarmstrong+sf@gmail.com>    **
 **                                                                   **
 ** HISTORY  - Date     By  Reason (most recent at the top pls)       **
 **            -------- --- ----------------------------------------- **
