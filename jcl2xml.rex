@@ -266,7 +266,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   call Prolog
 
   gDoc = createDocument('graphml')
-trace r
+
   call scanJobControlFile
 
   if g.!OPTION.GRAPHML
