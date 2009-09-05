@@ -1,5 +1,5 @@
-/*REXX 2.0.0.1
-
+/*REXX 2.0.0 $Rev$
+$Id$
 Copyright (c) 2009, Andrew J. Armstrong
 All rights reserved.
 
@@ -71,7 +71,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **********************************************************************/
 
   parse source . . sSourceFile .
-  parse value sourceline(1) with . sVersion .
+  parse value sourceline(1) with . sVersion
   say 'Simple Rexx I/O routines' sVersion
   say 'You cannot invoke this rexx by itself!'
   say

@@ -1,5 +1,5 @@
-/*REXX 2.0.0.1
-
+/*REXX 2.0.0 $Rev$
+$Id$
 Copyright (c) 2009, Andrew J. Armstrong
 All rights reserved.
 
@@ -101,7 +101,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   parse arg sFileIn sURL sNamespace' ('sOptions')'
 
   numeric digits 16
-  parse value sourceline(1) with . sVersion .
+  parse value sourceline(1) with . sVersion
   say 'IDL000I EntireX IDL to WSDL File Converter' sVersion
   if sFileIn = ''
   then do

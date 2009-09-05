@@ -1,5 +1,5 @@
-/*REXX 2.0.0.1
-
+/*REXX 2.0.0 $Rev$
+$Id$
 Copyright (c) 2009, Andrew J. Armstrong
 All rights reserved.
 
@@ -181,7 +181,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **                 auxtrace.html - HTML to scroll the SVG.           **
 **                 auxtrace.xml  - XML representation of trace.      **
 **                                                                   **
-** AUTHOR   - Andrew J. Armstrong <andrew_armstrong@unwired.com.au>  **
+** AUTHOR   - Andrew J. Armstrong <androidarmstrong+sf@gmail.com>    **
 **                                                                   **
 ** HISTORY  - Date     By  Reason (most recent at the top please)    **
 **            -------- --- ----------------------------------------- **
@@ -203,7 +203,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   parse arg sFileIn' ('sOptions')'
 
   numeric digits 16
-  say 'AUX000I CICS Auxiliary Trace Visualizer v1.2'
+  parse value sourceline(1) with . sVersion
+  say 'AUX000I CICS Auxiliary Trace Visualizer' sVersion
   if sFileIn = ''
   then do
     say 'Syntax:'
@@ -783,8 +784,8 @@ buildSVG: procedure expose g.
   call appendChild createTextNode(sTitle),title
 
   call addTooltip doc,,
-       'Created by CICS Auxiliary Trace Visualizer v1.2 by',
-       'Andrew J. Armstrong (andrew_armstrong@unwired.com.au)'
+       'Created by CICS Auxiliary Trace Visualizer' sVersion 'see',
+       'http://sourceforge.net/projects/rexxxmlparser/'
 
   g.!STYLE = createElement('style')
   call appendChild g.!STYLE,doc

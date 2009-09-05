@@ -1,5 +1,5 @@
-/*REXX 2.0.0.1
-
+/*REXX 2.0.0 $Rev$
+$Id$
 Copyright (c) 2009, Andrew J. Armstrong
 All rights reserved.
 
@@ -94,7 +94,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     then sFileOut = sFileIn /* you can do this on TSO but not Windows*/
   end
   g.!LEVEL = 0
-  parse value sourceline(1) with . sVersion .
+  parse value sourceline(1) with . sVersion
   call Say 'RPP000I Rexx INCLUDE Pre-processor' sVersion
   call Say 'RPP001I Output file is:' sFileOut
   sFileOut = getFile(sFileOut,'OUTPUT')
