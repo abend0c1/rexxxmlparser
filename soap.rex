@@ -113,7 +113,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **********************************************************************/
 
   parse arg sURL sService . '('sOptions')'
-  upper sOptions
+  sOptions = translate(sOptions) /* convert to upper case */
   
   parse value sourceline(1) with . sVersion
   say 'SOAP000I Rexx SOAP client' sVersion
