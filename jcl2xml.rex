@@ -58,6 +58,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **                                                                   **
 **               http://regina-rexx.sourceforge.net                  **
 **                                                                   **
+**            or ooRexx from:                                        **
+**                                                                   **
+**               http://oorexx.sourceforge.net                       **
+**                                                                   **
 **            If you run JCL2XML on your mainframe, you should use   **
 **            ftp to download the resulting files to your PC by:     **
 **                                                                   **
@@ -94,7 +98,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **               Displaying and snapping to grid lines is helpful    **
 **               while doing the tweaking.                           **
 **            7. If you intend to do this layout often, then click   **
-**               the As Tool button to move this dialog box to the   **
+**               the Dock button to move this dialog box to the      **
 **               left hand side of the window. You will now be able  **
 **               to just click the 'play' button to layout the       **
 **               graph instead of having to choose Layout from the   **
@@ -139,9 +143,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **                                                                   **
 **                       You can negate any option by prefixing it   **
 **                       with NO. For example, NOXML.                **
-**                                                                   **
-** NOTES    - 1. This uses the Rexx XML Parser in CBT FILE647 from   **
-**               www.cbttape.org.                                    **
 **                                                                   **
 **                                                                   **
 ** LOGIC    - The general approach is to:                            **
