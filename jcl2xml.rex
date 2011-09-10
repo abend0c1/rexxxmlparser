@@ -1,6 +1,6 @@
 /*REXX 2.0.0 $Rev$
 $Id$
-Copyright (c) 2009, Andrew J. Armstrong
+Copyright (c) 2011, Andrew J. Armstrong
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without 
@@ -164,6 +164,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **                                                                   **
 ** HISTORY  - Date     By  Reason (most recent at the top please)    **
 **            -------- --- ----------------------------------------- **
+**            20110910 AJA Fixed handling of instream data without a **
+**                         preceding DD card.                        **
 **            20110907 AJA Fixed handling of comments after IF, THEN **
 **                         and ELSE statements.                      **
 **            20110903 AJA Improved drawing of concatenated DDs.     **
@@ -416,6 +418,7 @@ scanJobControlFile: procedure expose g.
   g.!DELIM = '/*'  /* current end-of-data delimiter */
   g.!JCLDATA.0 = 0    /* current number of lines of inline data */
   g.!PENDING_STMT = ''
+  dd = '' /* DD associated with any inline data */
   call getStatement /* returns data in g.!JCLxxxx variables */
   if g.!OPTION.TRACE                                     /* 20070130 */
   then say ' Stmt  Line Type Name     Op       Operands'
@@ -551,6 +554,19 @@ scanJobControlFile: procedure expose g.
         sLastOper = g.!JCLOPER
       end
       when g.!JCLTYPE = g.!JCLTYPE_DATA then do
+        if dd = '' /* inline data without a preceding dd */
+        then do /* auto-generate a SYSIN DD statement */
+          g.!STMTID = g.!STMTID + 1
+          dd = newElement('dd')
+          call setAttributes dd,'_id',g.!STMTID,,
+                                '_line',g.!JCLLINE,,
+                                '_name','SYSIN',,
+                                '_','*',,
+                                '_comment','GENERATED STATEMENT'
+          parent = popUntil('cntl step proc job')
+          call appendChild dd,parent
+          call pushStack dd
+        end
         call appendChild getInlineDataNode(),dd
         g.!JCLDATA.0 = 0                                 /* 20070124 */
       end
@@ -632,7 +648,7 @@ appendAuthor: procedure expose g.
   comment = createComment('Created by JCL to XML Converter' g.!VERSION)
   call appendChild comment,node
   comment = createComment('by Andrew J. Armstrong',
-                          '(andrew_armstrong@unwired.com.au)')
+                          '(androidarmstrong@gmail.com)')
   call appendChild comment,node
 return
 
