@@ -157,12 +157,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ** AUTHOR   - Andrew J. Armstrong <androidarmstrong+sf@gmail.com>    **
 **                                                                   **
 ** CONTRIBUTORS -                                                    **
-**            Herbert.Frommwieser@partner.bmw.de                     **
-**            Anne.Feldmeier@partner.bmw.de                          **
+**            ZA  - Ze'ev Atlas <zatlas1@yahoo.com>                  **
+**            AF  - Anne.Feldmeier@partner.bmw.de                    **
+**            HF  - Herbert.Frommwieser@partner.bmw.de               **
 **                                                                   **
 **                                                                   **
 ** HISTORY  - Date     By  Reason (most recent at the top please)    **
 **            -------- --- ----------------------------------------- **
+**            20110907 AJA Fixed handling of comments after IF, THEN **
+**                         and ELSE statements.                      **
+**            20110903 AJA Improved drawing of concatenated DDs.     **
+**            20110903 ZA  Fixed getFileWithoutExtension to work when**
+**                         dots are present in the path name.        **
 **            20090822 AJA Changed from GPL to BSD license.          **
 **            20070323 AJA Used createDocumentFragment() API.        **
 **            20070220 AJA Added JCL option to output a file         **
@@ -347,9 +353,19 @@ return
 getFilenameWithoutExtension: procedure expose g.
   parse arg sFile
   nLastDot = lastpos('.',sFile)
-  if nLastDot > 1
-  then sFileName = substr(sFile,1,nLastDot-1)
-  else sFileName = sFile
+  /*ZA deal with dir with dot, file w/o dot */
+  nLastSlash = lastpos('\',sFile)
+  if nLastSlash = 0
+  then nLastSlash = lastpos('/',sFile) 
+   
+  if nLastSlash > nLastDot
+  then sFileName = sFile 
+  else do
+  /*ZA end */
+    if nLastDot > 1
+    then sFileName = substr(sFile,1,nLastDot-1)
+    else sFileName = sFile
+  end
 return sFileName
 
 initStack: procedure expose g.
@@ -473,6 +489,7 @@ scanJobControlFile: procedure expose g.
             parent = peekStack()
             call appendChild stmt,parent
             call pushStack stmt
+
           end
           when g.!JCLOPER = 'PEND' then do
             parent = popUntil('proc')
@@ -541,7 +558,7 @@ scanJobControlFile: procedure expose g.
         if nLastStatementType <> g.!JCLTYPE_COMMENT
         then do /* group multiple comment lines together */
           comment = newElement('comment','_line',g.!JCLLINE)
-          parent = popUntil('step proc job dd')
+          parent = popUntil('step proc job dd if then else') /* 20110907 */
           call appendChild comment,parent
         end
         call appendChild createTextNode(g.!JCLCOMM),comment
@@ -1694,16 +1711,23 @@ return sStatus
 
 newFileNode: procedure expose g.
   parse arg dd
-  sLabel = getAttribute(dd,'dsn')
   /* Get any concatenated dataset names too */
   dds = getChildrenByName(dd,'dd')
-  if dds <> '' then sLabel = '+0' sLabel
-  do i = 1 to words(dds)
-    concatdd = word(dds,i)
-    sDataset = getAttribute(concatdd,'dsn')
-    if sDataset = '' then sDataset = '(in stream)'
-    sLabel = sLabel || g.!LF || '+'i sDataset
+  if dds <> '' 
+  then do
+    sDataset = getAttribute(dd,'dsn')
+    if sDataset = '' 
+    then sLabel = getCDataLines(dd, '+0')
+    else sLabel = '+0' sDataset
+    do i = 1 to words(dds)
+      concatdd = word(dds,i)
+      sDataset = getAttribute(concatdd,'dsn')
+      if sDataset = '' 
+      then sLabel = sLabel || g.!LF || getCDataLines(concatdd, '+'i)
+      else sLabel = sLabel || g.!LF || '+'i sDataset
+    end
   end
+  else sLabel = getAttribute(dd,'dsn')
   gNode = newShapeNode(dd,sLabel)
 return gNode
 
@@ -1723,21 +1747,44 @@ return gNode
 /*                                                             20070119
  The children of an inline dd node are zero or more CDATA nodes (one
  for each card of inline data) with an implied linefeed between each.
-*/
+ If this dd contains only inline data, then show it as a block.
+ If this dd contains a mix of inline data and concatenated dds, then
+ show it as a new file node (see newFileNode).
+ */
 newInlineNode: procedure expose g.
   parse arg dd
-  sLabel = ''
-  line = getFirstChild(dd)
-  do while line <> ''
-    sLabel = sLabel || g.!LF || getText(line) /* CDATA text */
-    line = getNextSibling(line)
-  end
-  sLabel = strip(sLabel,'LEADING',g.!LF)
+  if isConcatenatedFile(dd)
+  then return newFileNode(dd)
+  sLabel = getCDataLines(dd, '')
   parse value getLabelDimension(sLabel) with nChars','nLines
   gGeometry = newTextGeometry(nChars,nLines)
   gFill = newElement('y:Fill','color',g.!COLOR_INLINE_NODE)
   gNode = newShapeNode(dd,sLabel,,gGeometry,gFill)
 return gNode
+
+getCDataLines: procedure expose g.
+  parse arg dd,sPrefix
+  bPrefix = sPrefix <> ''
+  sLines = ''
+  sPad = copies(' ',length(sPrefix))
+  if bPrefix then sPrefix = sPrefix '| '
+  line = getFirstChild(dd)
+  do while line <> '' & isCDATA(line) 
+    sData = getText(line)
+    if pos(g.!LF,sData) > 0
+    then do until sData = ''
+      parse var sData sLine (g.!LF) sData
+      sLines = sLines || sPrefix || sLine || g.!LF
+      if bPrefix 
+      then sPrefix = sPad '| '
+      else sPrefix = ''
+    end
+    else sLines = sLines || sPrefix || sData || g.!LF 
+    sPrefix = sPad
+    line = getNextSibling(line)
+  end
+  sLines = strip(sLines,'BOTH',g.!LF)
+return sLines
 
 newDummyNode: procedure expose g.
   parse arg dd
