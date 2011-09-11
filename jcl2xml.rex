@@ -164,6 +164,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **                                                                   **
 ** HISTORY  - Date     By  Reason (most recent at the top please)    **
 **            -------- --- ----------------------------------------- **
+**            20110911 AJA Clear dd for every JOB, EXEC and CNTL card**
 **            20110910 AJA Fixed handling of instream data without a **
 **                         preceding DD card.                        **
 **            20110907 AJA Fixed handling of comments after IF, THEN **
@@ -455,6 +456,7 @@ scanJobControlFile: procedure expose g.
             parent = popStack() /* discard 'if' */
           end
           when g.!JCLOPER = 'JOB' then do
+            dd = ''
             parent = popUntil('jcl')
             call appendChild stmt,parent
             call pushStack stmt
@@ -499,6 +501,7 @@ scanJobControlFile: procedure expose g.
             parent = popStack() /* discard 'proc' */
           end
           when g.!JCLOPER = 'CNTL' then do
+            dd = ''
             parent = popUntil('step proc job')
             call appendChild stmt,parent
             call pushStack stmt
@@ -508,6 +511,7 @@ scanJobControlFile: procedure expose g.
             parent = popStack() /* discard 'cntl' */
           end
           when g.!JCLOPER = 'EXEC' then do
+            dd = ''
             parent = popUntil('proc job then else')
             call appendChild stmt,parent
             call pushStack stmt
@@ -557,12 +561,11 @@ scanJobControlFile: procedure expose g.
         if dd = '' /* inline data without a preceding dd */
         then do /* auto-generate a SYSIN DD statement */
           g.!STMTID = g.!STMTID + 1
-          dd = newElement('dd')
-          call setAttributes dd,'_id',g.!STMTID,,
-                                '_line',g.!JCLLINE,,
-                                '_name','SYSIN',,
-                                '_','*',,
-                                '_comment','GENERATED STATEMENT'
+          dd = newElement('dd','_id',g.!STMTID,,
+                               '_line',g.!JCLLINE,,
+                               '_name','SYSIN',,
+                               '_','*',,
+                               '_comment','GENERATED STATEMENT')
           parent = popUntil('cntl step proc job')
           call appendChild dd,parent
           call pushStack dd
