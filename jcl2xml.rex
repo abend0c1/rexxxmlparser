@@ -164,6 +164,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **                                                                   **
 ** HISTORY  - Date     By  Reason (most recent at the top please)    **
 **            -------- --- ----------------------------------------- **
+**            20110929 AJA Prevent INCLUDE from becoming a parent of **
+**                         subsequent nodes. Ideally, JCL2XML should **
+**                         expand the included JCL but that is not   **
+**                         currently implemented.                    **
 **            20110911 AJA Clear dd for every JOB, EXEC and CNTL card**
 **            20110910 AJA Fixed handling of instream data without a **
 **                         preceding DD card.                        **
@@ -488,13 +492,11 @@ scanJobControlFile: procedure expose g.
             /* TODO: Replace this with the actual included text */
             parent = popUntil('step proc job')
             call appendChild stmt,parent
-            call pushStack stmt
           end
           when g.!JCLOPER = 'PROC' then do
             parent = peekStack()
             call appendChild stmt,parent
             call pushStack stmt
-
           end
           when g.!JCLOPER = 'PEND' then do
             parent = popUntil('proc')
