@@ -164,6 +164,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **                                                                   **
 ** HISTORY  - Date     By  Reason (most recent at the top please)    **
 **            -------- --- ----------------------------------------- **
+**            20111109 AJA Added JES3 option so that NOJES3 can be   **
+**                         specified to prevent comments that happen **
+**                         to look like JES3 statements being parsed.**
 **            20110929 AJA Prevent INCLUDE from becoming a parent of **
 **                         subsequent nodes. Ideally, JCL2XML should **
 **                         expand the included JCL but that is not   **
@@ -902,6 +905,7 @@ return
 
 isJes3Statement: procedure expose g.
   arg sStmt
+  if \g.!OPTION.JES3 then return 0 
   sJes3Stmts = 'DATASET ENDDATASET ENDPROCESS FORMAT MAIN NET NETACCT',
                'OPERATOR *PAUSE PROCESS ROUTE'
 return wordpos(sStmt,sJes3Stmts) > 0
@@ -2169,6 +2173,7 @@ setOptions: procedure expose g.
   if g.!ENV = 'TSO' then g.!OPTION.WRAP = 1 /* TSO is special  */
   g.!OPTION.LINE     = 0 /* Output XML _line attributes?       */
   g.!OPTION.ID       = 0 /* Output XML _id attributes?         */
+  g.!OPTION.JES3     = 1 /* Process JES3 statements?           */
   do i = 1 to words(sOptions)
     sOption = word(sOptions,i)
     if left(sOption,2) = 'NO'
