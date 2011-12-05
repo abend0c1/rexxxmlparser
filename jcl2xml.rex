@@ -164,6 +164,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **                                                                   **
 ** HISTORY  - Date     By  Reason (most recent at the top please)    **
 **            -------- --- ----------------------------------------- **
+**            20111205 AJA Corrected parsing of key=(value) operands **
+**                         where value contains quoted strings.      **
+**                         Added getSafeAttrName function to avoid   **
+**                         generating attribute names containing     **
+**                         '@', '#' or '$' characters. None is valid **
+**                         in an XML attribute name so they are      **
+**                         translated to uppercase 'A', 'N' and 'S'  **
+**                         respectively. For example, DB# becomes dbN**
+**                         Renamed deQuote to deNormalize and removed**
+**                         dead code.                                **
 **            20111109 AJA Added JES3 option so that NOJES3 can be   **
 **                         specified to prevent comments that happen **
 **                         to look like JES3 statements being parsed.**
@@ -1057,7 +1067,7 @@ newStatementNode: procedure expose g.
       end
       do i = 1 to g.!PARM.0
         sKey   = g.!PARM.i
-        call setAttribute stmt,sKey,getParm(sKey)
+        call setAttribute stmt,getSafeAttrName(sKey),getParm(sKey)
       end
     end
     when sNodeName = 'job' then do
@@ -1071,18 +1081,22 @@ newStatementNode: procedure expose g.
           then parse var sPositionals '('sAcctAndInfo'),'sProg
           else parse var sPositionals sAcctAndInfo','sProg
           parse var sAcctAndInfo sAcct','sInfo
-          call setAttributes stmt,'acct',deQuote(sAcct),,
-                                  'acctinfo',deQuote(sInfo),,
-                                  'pgmr',deQuote(sProg)
+          call setAttributes stmt,'acct',deNormalize(sAcct),,
+                                  'acctinfo',deNormalize(sInfo),,
+                                  'pgmr',deNormalize(sProg)
         end
         else do
-          call setAttribute stmt,sKey,getParm(sKey)
+          call setAttribute stmt,getSafeAttrName(sKey),getParm(sKey)
         end
       end
     end
     otherwise call setParms stmt
   end
 return stmt
+
+getSafeAttrName: procedure expose g.
+  parse arg sAttrName
+return translate(sAttrName,'ANS','@#$')
 
 setParms: procedure expose g.
   parse arg stmt
@@ -1094,21 +1108,10 @@ return
 
 getParm: procedure expose g.
   parse arg sKey
-return deQuote(g.!PARM.sKey)
+return deNormalize(g.!PARM.sKey)
 
-deQuote: procedure expose g.
+deNormalize: procedure expose g.
   parse arg sValue
-return translate(sValue,' ','ff'x)
-
-  /*
-  if left(sValue,1) = "'"  /- 'abc' --> abc -/
-  then sValue = substr(sValue,2,length(sValue)-2)
-  */
-  n = pos("''",sValue)
-  do while n > 0
-    sValue = delstr(sValue,n,1)  /* '' --> ' */
-    n = pos("''",sValue)
-  end
 return translate(sValue,' ','ff'x)
 
 /*
@@ -1225,14 +1228,17 @@ getParmMap: procedure expose g.
 return
 
 /* (abc) --> 5 */
+/* ('abc') --> 7 */ 
 getInBracketsLength: procedure expose g.
   parse arg sValue
+  bInString = 0
   nLvl = 0
   do i = 1 to length(sValue) until nLvl = 0
     c = substr(sValue,i,1)
     select
-      when c = '(' then nLvl = nLvl + 1
-      when c = ')' then nLvl = nLvl - 1
+      when c = '(' & \bInString then nLvl = nLvl + 1
+      when c = ')' & \bInString then nLvl = nLvl - 1
+      when c = "'" then bInString = \bInString
       otherwise nop
     end
   end
