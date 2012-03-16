@@ -164,6 +164,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **                                                                   **
 ** HISTORY  - Date     By  Reason (most recent at the top please)    **
 **            -------- --- ----------------------------------------- **
+**            20120316 AJA Return always (instead of exit)           **
 **            20120315 AJA Return if called as a subroutine else     **
 **                         exit.                                     **
 **            20111205 AJA Corrected parsing of key=(value) operands **
@@ -243,6 +244,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **                                                                   **
 **********************************************************************/
 
+jcl2xml:
   parse arg sFileIn sFileOut' ('sOptions')'
 
   numeric digits 16
@@ -274,9 +276,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     say
     say '              You can negate any option by prefixing it'
     say '              with NO. For example, NOXML.'
-    parse source . sCallMode .
-    if sCallMode = 'SUBROUTINE' then return
-    exit
+    return
   end
   say 'JCL001I Scanning job control in' sFileIn
 
@@ -331,8 +331,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   call Epilog
   say 'JCL002I Done'
   parse source . sCallMode .
-  if sCallMode = 'SUBROUTINE' then return
-exit
+return
 
 
 /* The JobControl input filename is supplied by the user.
