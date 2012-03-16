@@ -330,7 +330,6 @@ jcl2xml:
 
   call Epilog
   say 'JCL002I Done'
-  parse source . sCallMode .
 return
 
 
