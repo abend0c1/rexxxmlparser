@@ -1531,9 +1531,9 @@ return g.0TYPE.id = g.0ELEMENT_NODE |,
   expose g.
   /* _canHaveChildren: procedure expose g. */
   parse arg id
-return g.0TYPE.parent <> g.0ELEMENT_NODE &,
-       g.0TYPE.parent <> g.0DOCUMENT_NODE &,
-       g.0TYPE.parent <> g.0DOCUMENT_FRAGMENT_NODE
+return g.0TYPE.id = g.0ELEMENT_NODE |,
+       g.0TYPE.id = g.0DOCUMENT_NODE |,
+       g.0TYPE.id = g.0DOCUMENT_FRAGMENT_NODE
 
 ::method getParent  
   expose g.
