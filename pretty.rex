@@ -69,6 +69,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **                                                                   **
 ** HISTORY  - Date     By  Reason (most recent at the top please)    **
 **            -------- --------------------------------------------- **
+**            20200628 AJA Added showNodeNonRecursive function.      **
 **            20090822 AJA Changed from GPL to BSD license.          **
 **            20050920 AJA Allow root node to be specified.          **
 **            20050907 AJA Escape text of attribute values.          **
@@ -97,6 +98,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     address ISPEXEC
     'CONTROL ERRORS RETURN'
     g.0LINES = 0
+    g.0NONRECURSIVE = 1
   end
 
   call prettyPrinter sFileOut,2 /* 2 is the indentation amount */
@@ -127,8 +129,14 @@ prettyPrinter: procedure expose g.
   call _setDefaultEntities
 
   call emitProlog
-  g.0INDENT = -g.0TAB
-  call showNode nRoot
+  if g.0NONRECURSIVE = 1
+  then do
+    call showNodeNonRecursive nRoot
+   end
+  else do
+    g.0INDENT = -g.0TAB
+    call showNode nRoot
+  end
 
   if g.0FILEOUT <> ''
   then do
@@ -137,6 +145,74 @@ prettyPrinter: procedure expose g.
   end
 return
 
+showNodeNonRecursive: procedure expose g.
+  parse arg topNodeAgain
+  g.0INDENT = 0
+  node = topNodeAgain
+  do until node = topNodeAgain | node = 0
+    if g.0SEEN.node = ''
+    then call emitBegin node
+    else call emitEnd node
+    g.0SEEN.node = 1
+    if g.0SOUTH.node = '' then do
+      g.0SOUTH.node = 1
+      if hasChildren(node)
+      then do
+        node = getFirstChild(node)
+      end
+      else do
+        call emitEnd node
+        nextSibling = getNextSibling(node)
+        if nextSibling = ''
+        then node = getParent(node)
+        else node = nextSibling
+      end
+    end
+    else do
+      nextSibling = getNextSibling(node)
+      if nextSibling = ''
+      then node = getParent(node)
+      else node = nextSibling
+    end
+  end
+  call emitEnd node
+  drop g.0SOUTH. g.0SEEN.
+return
+
+emitBegin: procedure expose g.
+  parse arg node
+  select
+    when isElementNode(node) then call emitElementNodeNonRecursive(node)
+    when isTextNode(node)    then call emitTextNode(node)
+    when isCommentNode(node) then call emitCommentNode(node)
+    when isCDATA(node)       then call emitCDATA(node)
+    otherwise nop
+  end
+  g.0INDENT = g.0INDENT + 2
+return
+
+emitEnd: procedure expose g.
+  parse arg node
+  g.0INDENT = g.0INDENT - 2
+  if isElementNode(node) & hasChildren(node)
+  then call Say '</'getName(node)'>'
+return
+
+emitElementNodeNonRecursive: procedure expose g.
+  parse arg node
+  if hasChildren(node)
+  then call Say '<'getName(node)getAttrs(node)'>'
+  else call Say '<'getName(node)getAttrs(node)'/>'
+return
+
+getAttrs: procedure expose g.
+  parse arg node
+  sAttrs = ''
+  do i = 1 to getAttributeCount(node)
+    sAttrs = sAttrs getAttributeName(node,i)'="' ||,
+                    escapeText(getAttribute(node,i))'"'
+  end
+return sAttrs
 
 emitProlog: procedure expose g.
   if g.?xml.version = ''
@@ -178,9 +254,11 @@ return
 
 emitTextNode: procedure expose g.
   parse arg node
+  sText = getText(node)
+  if sText = '' then return
   if g.0PRESERVEWS = 1
-  then call Say escapeText(getText(node))
-  else call Say escapeText(removeWhitespace(getText(node)))
+  then call Say escapeText(sText)
+  else call Say escapeText(removeWhitespace(sText))
 return
 
 emitCommentNode: procedure expose g.
