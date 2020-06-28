@@ -1737,7 +1737,10 @@ return
             'of <'self~getNodeName(g.0PARENT.id)'>:',
             'insertBefore('id','ref')')
   g.0NEXT.id = ref
+  oldprev = g.0PREV.ref
   g.0PREV.ref = id
+  g.0NEXT.oldprev = id
+  g.0PREV.id = oldprev
   if g.0FIRST.parent = ref
   then g.0FIRST.parent = id
 return
