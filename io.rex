@@ -93,7 +93,7 @@ openFile: procedure expose g.
   parse arg sFile,sOptions,sAttrs
   hFile = ''
   select
-    when g.!ENV = 'TSO' then do
+    when g.0ENV = 'TSO' then do
       bOutput = wordpos('OUTPUT',sOptions) > 0
       bQuoted = left(sFile,1) = "'"
       if bQuoted then sFile = strip(sFile,,"'")
@@ -107,13 +107,13 @@ openFile: procedure expose g.
       then do /* Open a member of a PDS */
         'LMOPEN  DATAID(&hFile) OPTION(INPUT)' /* Input initially */
         /* ... can't update ISPF stats when opened for output */
-        g.!MEMBER.hFile = sMember
+        g.0MEMBER.hFile = sMember
         'LMMFIND DATAID(&hFile) MEMBER('sMember') STATS(YES)'
         if bOutput
         then do
           if rc = 0
-          then g.!STATS.hFile = zlvers','zlmod','zlc4date
-          else g.!STATS.hFile = '1,0,0000/00/00'
+          then g.0STATS.hFile = zlvers','zlmod','zlc4date
+          else g.0STATS.hFile = '1,0,0000/00/00'
           'LMCLOSE DATAID(&hFile)'
           'LMOPEN  DATAID(&hFile) OPTION(&sOptions)'
         end
@@ -126,7 +126,7 @@ openFile: procedure expose g.
           'LMFREE  DATAID(&hFile)'
           address TSO 'ALLOCATE DATASET('sFile') NEW CATALOG',
                       'SPACE(5,15) TRACKS RECFM(V,B)',
-                      'LRECL('g.!OPTION.WRAP.1 + 4')',
+                      'LRECL('g.0OPTION.WRAP.1 + 4')',
                       'BLKSIZE(27990)' sAttrs
           if bOutput
           then do
@@ -139,8 +139,8 @@ openFile: procedure expose g.
           end
         end
       end
-      g.!OPTIONS.hFile = sOptions
-      g.!rc = rc /* Return code from LMOPEN */
+      g.0OPTIONS.hFile = sOptions
+      g.0rc = rc /* Return code from LMOPEN */
     end
     otherwise do
       if wordpos('OUTPUT',sOptions) > 0
@@ -148,8 +148,8 @@ openFile: procedure expose g.
       else junk = stream(sFile,'COMMAND','OPEN READ')
       hFile = sFile
       if stream(sFile,'STATUS') = 'READY'
-      then g.!rc = 0
-      else g.!rc = 4
+      then g.0rc = 0
+      else g.0rc = 4
     end
   end
 return hFile
@@ -162,18 +162,18 @@ getLine: procedure expose g.
   parse arg hFile
   sLine = ''
   select
-    when g.!ENV = 'TSO' then do
+    when g.0ENV = 'TSO' then do
       'LMGET DATAID(&hFile) MODE(INVAR)',
             'DATALOC(sLine) DATALEN(nLine) MAXLEN(32768)'
-      g.!rc = rc
+      g.0rc = rc
       sLine = strip(sLine,'TRAILING')
       if sLine = '' then sLine = ' '
     end
     otherwise do
-      g.!rc = 0
+      g.0rc = 0
       if chars(hFile) > 0
       then sLine = linein(hFile)
-      else g.!rc = 4
+      else g.0rc = 4
     end
   end
 return sLine
@@ -185,8 +185,8 @@ return sLine
 putLine: procedure expose g.
   parse arg hFile,sLine
   select
-    when g.!ENV = 'TSO' then do
-      g.!LINES = g.!LINES + 1
+    when g.0ENV = 'TSO' then do
+      g.0LINES = g.0LINES + 1
       'LMPUT DATAID(&hFile) MODE(INVAR)',
             'DATALOC(sLine) DATALEN('length(sLine)')'
     end
@@ -205,13 +205,13 @@ closeFile: procedure expose g.
   parse arg hFile
   rc = 0
   select
-    when g.!ENV = 'TSO' then do
-      if g.!MEMBER.hFile <> '', /* if its a PDS */
-      & wordpos('OUTPUT',g.!OPTIONS.hFile) > 0 /* opened for output */
+    when g.0ENV = 'TSO' then do
+      if g.0MEMBER.hFile <> '', /* if its a PDS */
+      & wordpos('OUTPUT',g.0OPTIONS.hFile) > 0 /* opened for output */
       then do
         parse value date('STANDARD') with yyyy +4 mm +2 dd +2
-        parse var g.!STATS.hFile zlvers','zlmod','zlc4date
-        zlcnorc  = min(g.!LINES,65535)   /* Number of lines   */
+        parse var g.0STATS.hFile zlvers','zlmod','zlc4date
+        zlcnorc  = min(g.0LINES,65535)   /* Number of lines   */
         nVer = right(zlvers,2,'0')right(zlmod,2,'0')  /* vvmm */
         nVer = right(nVer+1,4,'0')       /* vvmm + 1          */
         parse var nVer zlvers +2 zlmod +2
@@ -220,7 +220,7 @@ closeFile: procedure expose g.
         zlm4date = yyyy'/'mm'/'dd        /* Modification date */
         zlmtime  = time()                /* Modification time */
         zluser   = userid()              /* Modification user */
-        'LMMREP DATAID(&hFile) MEMBER('g.!MEMBER.hFile') STATS(YES)'
+        'LMMREP DATAID(&hFile) MEMBER('g.0MEMBER.hFile') STATS(YES)'
       end
       'LMCLOSE DATAID(&hFile)'
       'LMFREE  DATAID(&hFile)'

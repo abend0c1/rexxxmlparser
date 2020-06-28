@@ -85,12 +85,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   sOptions = 'NOBLANKS' translate(sOptions)
   call initParser sOptions /* DO THIS FIRST! Sets g. vars to '' */
 
-  parse source g.!ENV .
-  if g.!ENV = 'TSO'
+  parse source g.0ENV .
+  if g.0ENV = 'TSO'
   then do
     address ISPEXEC
     'CONTROL ERRORS RETURN'
-    g.!LINES = 0
+    g.0LINES = 0
   end
 
   call Prolog
@@ -99,9 +99,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   nParseRC = parseFile(sFileIn)
   doc = getDocumentElement()
 
-  g.!PREFIXES = getVisioNamespacePrefixes(doc)
+  g.0PREFIXES = getVisioNamespacePrefixes(doc)
   say 'VIS002I Removing elements and attributes with prefixes:',
-      g.!PREFIXES
+      g.0PREFIXES
 
   call removeVisioTags doc
 
@@ -166,7 +166,7 @@ isVisioExtension: procedure expose g.
   if wordpos(sTagName,'title desc') > 0 then return 1
   if pos(':',sTagName) = 0              then return 0
   parse arg sPrefix':'
-  if wordpos(sPrefix,g.!PREFIXES) > 0   then return 1
+  if wordpos(sPrefix,g.0PREFIXES) > 0   then return 1
 return 0
 
 findAllReferences: procedure expose g.
@@ -175,13 +175,13 @@ findAllReferences: procedure expose g.
   do while pos('url(#',sText) > 0
     parse var sText 'url(#'sId')'sText
     sRef = '#'sId
-    g.!ID.sRef = 1
+    g.0ID.sRef = 1
   end
   if hasAttribute(node,'xlink:href')
   then do
     sId = getAttribute(node,'xlink:href')
     if left(sId,1) = '#' /* is it a local reference? */
-    then g.!ID.sId = 1 /* For example: g.!ID.#mrkr13-14 = 1 */
+    then g.0ID.sId = 1 /* For example: g.0ID.#mrkr13-14 = 1 */
   end
   children = getChildNodes(node)
   do i = 1 to words(children)
@@ -196,7 +196,7 @@ removeUnusedReferences: procedure expose g.
   then do
     sId = getAttribute(node,'id')
     sRef = '#'sId
-    if g.!ID.sRef <> 1
+    if g.0ID.sRef <> 1
     then call removeAttribute node,'id'
   end
   children = getChildNodes(node)

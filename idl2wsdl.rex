@@ -135,20 +135,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   call initParser sOptions /* DO THIS FIRST! Sets g. vars to '' */
   call setDocType /* we don't need a doctype declaration */
 
-  g.!FILEIDL = sFileIn
-  g.!URL = prompt(sURL,,
+  g.0FILEIDL = sFileIn
+  g.0URL = prompt(sURL,,
                   'Enter URL of this service',,
                   'http://10.1.2.3:8080/cics/cwba/soapima/')
-  g.!NAMESPACE = prompt(sNamespace,,
+  g.0NAMESPACE = prompt(sNamespace,,
                   'Enter XML namespace of this service',,
                   'http://myservice.example.org')
 
-  parse source g.!ENV .
-  if g.!ENV = 'TSO'
+  parse source g.0ENV .
+  if g.0ENV = 'TSO'
   then do
     address ISPEXEC
     'CONTROL ERRORS RETURN'
-    g.!LINES = 0
+    g.0LINES = 0
   end
 
   call setOptions sOptions
@@ -194,15 +194,15 @@ return sReply
 */
 createWSDL: procedure expose g.
   parse arg sFile,node
-  if g.!OPTION.XML
+  if g.0OPTION.XML
   then call prettyPrinter sFile'.xml',,node
 
   /* Build the high-level WSDL file structure... */
-  g.!DEFS     = createElement('wsdl:definitions')
-  g.!TYPES    = createElement('wsdl:types')
-  g.!PORTTYPE = createElement('wsdl:portType')
-  g.!BINDING  = createElement('wsdl:binding')
-  g.!SERVICE  = createElement('wsdl:service')
+  g.0DEFS     = createElement('wsdl:definitions')
+  g.0TYPES    = createElement('wsdl:types')
+  g.0PORTTYPE = createElement('wsdl:portType')
+  g.0BINDING  = createElement('wsdl:binding')
+  g.0SERVICE  = createElement('wsdl:service')
 
   /* The porttype, binding and service elements are more-or-less the
      same for all combinations of style and use, so build them now... */
@@ -211,54 +211,54 @@ createWSDL: procedure expose g.
   call definePortType node
   call defineBinding node
   call defineService node
-  call appendChild g.!TYPES,g.!DEFS
+  call appendChild g.0TYPES,g.0DEFS
 
 
   /* Now add message elements depending on style and use... */
   select
-    when g.!OPTION.WRAPPED then,
+    when g.0OPTION.WRAPPED then,
       call createDocWrapped node
-    when g.!OPTION.DOCUMENT & g.!OPTION.LITERAL then,
+    when g.0OPTION.DOCUMENT & g.0OPTION.LITERAL then,
       call createDocLiteral node
-    when g.!OPTION.RPC & g.!OPTION.LITERAL then,
+    when g.0OPTION.RPC & g.0OPTION.LITERAL then,
       call createRpcLiteral node
-    when g.!OPTION.RPC & g.!OPTION.ENCODED then,
+    when g.0OPTION.RPC & g.0OPTION.ENCODED then,
       call createRpcEncoded node
     otherwise,
       call createDocWrapped node
   end
 
-  call appendChild g.!PORTTYPE,g.!DEFS
-  call appendChild g.!BINDING,g.!DEFS
-  call appendChild g.!SERVICE,g.!DEFS
+  call appendChild g.0PORTTYPE,g.0DEFS
+  call appendChild g.0BINDING,g.0DEFS
+  call appendChild g.0SERVICE,g.0DEFS
 
   /* Serialise the WSDL document to a file... */
-  call prettyPrinter sFile'.wsdl',,g.!DEFS
+  call prettyPrinter sFile'.wsdl',,g.0DEFS
 return
 
 
 defineDefinitions: procedure expose g.
   parse arg node
-  call setAttributes g.!DEFS,,
-       'targetNamespace',g.!NAMESPACE,,
-       'xmlns:impl',g.!NAMESPACE,,
-       'xmlns:intf',g.!NAMESPACE,,
+  call setAttributes g.0DEFS,,
+       'targetNamespace',g.0NAMESPACE,,
+       'xmlns:impl',g.0NAMESPACE,,
+       'xmlns:intf',g.0NAMESPACE,,
        'xmlns:wsdl','http://schemas.xmlsoap.org/wsdl/',,
        'xmlns:wsdlsoap','http://schemas.xmlsoap.org/wsdl/soap/',,
        'xmlns:xsd','http://www.w3.org/2001/XMLSchema'
 
-  if g.!OPTION.ENCODED
-  then call setAttribute g.!DEFS,,
+  if g.0OPTION.ENCODED
+  then call setAttribute g.0DEFS,,
        'xmlns:soapenc','http://schemas.xmlsoap.org/soap/encoding/'
 
   call appendChild createComment('Created by EntireX IDL-to-WSDL',
-       'converter V1.0 on' date() time() userid()),g.!DEFS
+       'converter V1.0 on' date() time() userid()),g.0DEFS
 
-  if g.!OPTION.WRAPPED
+  if g.0OPTION.WRAPPED
   then call appendChild createComment('Style='getStyle() '(wrapped)',
-            'Use='getUse()),g.!DEFS
+            'Use='getUse()),g.0DEFS
   else call appendChild createComment('Style='getStyle(),
-            'Use='getUse()),g.!DEFS
+            'Use='getUse()),g.0DEFS
 return
 
 /*
@@ -286,17 +286,17 @@ return
 */
 defineTypes: procedure expose g.
   parse arg node
-  g.!SCHEMA = createElement('schema')
-  call appendChild g.!SCHEMA,g.!TYPES
-  if g.!OPTION.DOCUMENT | g.!OPTION.WRAPPED
-  then call setAttribute g.!SCHEMA,'elementFormDefault','qualified'
-  call setAttributes g.!SCHEMA,,
-       'targetNamespace',g.!NAMESPACE,,
+  g.0SCHEMA = createElement('schema')
+  call appendChild g.0SCHEMA,g.0TYPES
+  if g.0OPTION.DOCUMENT | g.0OPTION.WRAPPED
+  then call setAttribute g.0SCHEMA,'elementFormDefault','qualified'
+  call setAttributes g.0SCHEMA,,
+       'targetNamespace',g.0NAMESPACE,,
        'xmlns','http://www.w3.org/2001/XMLSchema'
-  if g.!OPTION.ENCODED
+  if g.0OPTION.ENCODED
   then do
     import = createElement('import')
-    call appendChild import,g.!SCHEMA
+    call appendChild import,g.0SCHEMA
     call setAttribute import,,
          'namespace','http://schemas.xmlsoap.org/soap/encoding/'
   end
@@ -304,7 +304,7 @@ defineTypes: procedure expose g.
   structures = getChildren(structuresnode)
   do i = 1 to words(structures)
     struct = word(structures,i)
-    call appendComplexType struct,g.!SCHEMA
+    call appendComplexType struct,g.0SCHEMA
   end
 return
 
@@ -319,7 +319,7 @@ return
 definePortType: procedure expose g.
   parse arg node
   sService = getAttribute(node,'name')
-  call setAttribute g.!PORTTYPE,'name',sService
+  call setAttribute g.0PORTTYPE,'name',sService
   programs = getChildrenByName(node,'programs')
   if programs <> ''
   then do
@@ -328,7 +328,7 @@ definePortType: procedure expose g.
       program = word(programs,i)
       sOperation = getAttribute(program,'name')
       operation = createElement('wsdl:operation')
-      call appendChild operation,g.!PORTTYPE
+      call appendChild operation,g.0PORTTYPE
       call setAttribute operation,'name',sOperation
       input = createElement('wsdl:input')
       call appendChild input,operation
@@ -371,11 +371,11 @@ return
 defineBinding: procedure expose g.
   parse arg node
   sService = getAttribute(node,'name')
-  call setAttributes g.!BINDING,,
+  call setAttributes g.0BINDING,,
        'name',sService'SoapBinding',,
        'type','impl:'sService
   soapbinding = createElement('wsdlsoap:binding')
-  call appendChild soapbinding,g.!BINDING
+  call appendChild soapbinding,g.0BINDING
   call setAttributes soapbinding,,
        'style',getStyle(),,
        'transport','http://schemas.xmlsoap.org/soap/http'
@@ -388,7 +388,7 @@ defineBinding: procedure expose g.
       sOperation = getAttribute(program,'name')
       operation = createElement('wsdl:operation')
       call setAttribute operation,'name',sOperation
-      call appendChild operation,g.!BINDING
+      call appendChild operation,g.0BINDING
       soapoperation = createElement('wsdlsoap:operation')
       call appendChild soapoperation,operation
       call setAttribute soapoperation,'soapAction',''
@@ -398,11 +398,11 @@ defineBinding: procedure expose g.
       call setAttribute input,'name',sOperation'Request'
       body = createElement('wsdlsoap:body')
       call appendChild body,input
-      if g.!OPTION.ENCODED
+      if g.0OPTION.ENCODED
       then call setAttribute body,,
            'encodingStyle','http://schemas.xmlsoap.org/soap/encoding/'
       call setAttributes body,,
-           'namespace',g.!NAMESPACE,,
+           'namespace',g.0NAMESPACE,,
            'use',getUse()
 
       output = createElement('wsdl:output')
@@ -410,24 +410,24 @@ defineBinding: procedure expose g.
       call setAttribute output,'name',sOperation'Response'
       body = createElement('wsdlsoap:body')
       call appendChild body,output
-      if g.!OPTION.ENCODED
+      if g.0OPTION.ENCODED
       then call setAttribute body,,
            'encodingStyle','http://schemas.xmlsoap.org/soap/encoding/'
-      if g.!OPTION.RPC
-      then call setAttribute body,'namespace',g.!NAMESPACE
+      if g.0OPTION.RPC
+      then call setAttribute body,'namespace',g.0NAMESPACE
       call setAttribute body,'use',getUse()
     end
   end
 return
 
 getStyle: procedure expose g.
-  if g.!OPTION.RPC
+  if g.0OPTION.RPC
   then sStyle = 'rpc'
   else sStyle = 'document'
 return sStyle
 
 getUse: procedure expose g.
-  if g.!OPTION.ENCODED
+  if g.0OPTION.ENCODED
   then sUse = 'encoded'
   else sUse = 'literal'
 return sUse
@@ -444,16 +444,16 @@ return sUse
 defineService: procedure expose g.
   parse arg node
   sService = getAttribute(node,'name')
-  call setAttribute g.!SERVICE,'name',sService'Service'
+  call setAttribute g.0SERVICE,'name',sService'Service'
   port = createElement('wsdl:port')
-  call appendChild port,g.!SERVICE
+  call appendChild port,g.0SERVICE
   call setAttributes port,,
        'binding','impl:'sService'SoapBinding',,
        'name',sService
   addr = createElement('wsdlsoap:address')
   call appendChild addr,port
   call setAttribute addr,,
-       'location',g.!URL || sService
+       'location',g.0URL || sService
 return
 
 /*
@@ -492,10 +492,10 @@ createDocLiteral: procedure expose g.
       program = word(programs,i)
       sOperation = getAttribute(program,'name')
       request  = createElement('wsdl:message')
-      call appendChild request,g.!DEFS
+      call appendChild request,g.0DEFS
       call setAttribute request,'name',sOperation'Request'
       response = createElement('wsdl:message')
-      call appendChild response,g.!DEFS
+      call appendChild response,g.0DEFS
       call setAttribute response,'name',sOperation'Response'
       parms = getChildren(program)
       do j = 1 to words(parms)
@@ -528,16 +528,16 @@ or
 appendPartSchema: procedure expose g.
   parse arg sName,sEntireXType,node
   sElementName = sName
-  if g.!USED.sElementName = 1 /* If this name is already used */
+  if g.0USED.sElementName = 1 /* If this name is already used */
   then do
-    do i = 1 by 1 until g.!USED.sNameX = ''
+    do i = 1 by 1 until g.0USED.sNameX = ''
       sNameX = sElementName || i
     end
     sElementName = sNameX
   end
-  g.!USED.sElementName = 1
+  g.0USED.sElementName = 1
   element = createElement('element')
-  call appendChild element,g.!SCHEMA
+  call appendChild element,g.0SCHEMA
   call setAttributes element,,
        'name',sElementName,,
        'type',getSchemaEncoding(sEntireXType)
@@ -613,7 +613,7 @@ return
 appendMessage: procedure expose g.
   parse arg sMessageName,sElementName
   message = createElement('wsdl:message')
-  call appendChild message,g.!DEFS
+  call appendChild message,g.0DEFS
   call setAttribute message,'name',sMessageName
   part = createElement('wsdl:part')
   call appendChild part,message
@@ -643,7 +643,7 @@ return
 getSequence: procedure expose g.
   parse arg sName
   element = createElement('element')
-  call appendChild element,g.!SCHEMA
+  call appendChild element,g.0SCHEMA
   call setAttribute element,'name',sName
   complexType = createElement('complexType')
   call appendChild complexType,element
@@ -717,10 +717,10 @@ createRpcLiteral: procedure expose g.
       program = word(programs,i)
       sOperation = getAttribute(program,'name')
       request  = createElement('wsdl:message')
-      call appendChild request,g.!DEFS
+      call appendChild request,g.0DEFS
       call setAttribute request,'name',sOperation'Request'
       response = createElement('wsdl:message')
-      call appendChild response,g.!DEFS
+      call appendChild response,g.0DEFS
       call setAttribute response,'name',sOperation'Response'
       parms = getChildren(program)
       do j = 1 to words(parms)
@@ -779,10 +779,10 @@ createRpcEncoded: procedure expose g.
       program = word(programs,i)
       sOperation = getAttribute(program,'name')
       request  = createElement('wsdl:message')
-      call appendChild request,g.!DEFS
+      call appendChild request,g.0DEFS
       call setAttribute request,'name',sOperation'Request'
       response = createElement('wsdl:message')
-      call appendChild response,g.!DEFS
+      call appendChild response,g.0DEFS
       call setAttribute response,'name',sOperation'Response'
       parms = getChildren(program)
       do j = 1 to words(parms)
@@ -887,7 +887,7 @@ return
 
 getEncoding: procedure expose g.
   parse arg sEntireXType
-  if g.!OPTION.ENCODED
+  if g.0OPTION.ENCODED
   then sEncoding = getSoapEncoding(sEntireXType)
   else sEncoding = getSchemaEncoding(sEntireXType)
 return sEncoding
@@ -998,9 +998,9 @@ return reverse(sRest)
 
 scanEntireXIdlFile: procedure expose g.
   idl = createElement('idl')
-  g.!FILEIN = openFile(g.!FILEIDL)
+  g.0FILEIN = openFile(g.0FILEIDL)
   sLine = getNextLine()
-  do while g.!RC = 0 & sLine <> '** End of file'
+  do while g.0RC = 0 & sLine <> '** End of file'
     parse var sLine sAction sName ' is'
     select
       when sAction = 'library' then do
@@ -1030,7 +1030,7 @@ scanEntireXIdlFile: procedure expose g.
       end
       when sAction = 'struct' then do
         parse var sName sName':'sAlias
-        g.!STRUCT = sName
+        g.0STRUCT = sName
         sName  = strip(sName,'BOTH',"'")
         sAlias = strip(sAlias,'BOTH',"'")
         struct = createElement('struct')
@@ -1046,15 +1046,15 @@ scanEntireXIdlFile: procedure expose g.
     end
     sLine = getNextLine()
   end
-  rc = closeFile(g.!FILEIN)
+  rc = closeFile(g.0FILEIN)
 return idl
 
 getParameters: procedure expose g.
   parse arg parent
   sLine = getLineContaining('define data parameter')
-  if g.!RC <> 0 then return
+  if g.0RC <> 0 then return
   sLine = getNextLine()
-  do while g.!RC = 0 & sLine <> 'end-define'
+  do while g.0RC = 0 & sLine <> 'end-define'
     parse var sLine nLevel sName '('sType')' sDirection
     parm = createElement('parm')
     call appendChild parm,parent
@@ -1070,16 +1070,16 @@ return
 
 getLineContaining: procedure expose g.
   parse arg sSearchArg
-  sLine = getLine(g.!FILEIN)
-  do while g.!RC = 0 & pos(sSearchArg, sLine) = 0
-    sLine = getLine(g.!FILEIN)
+  sLine = getLine(g.0FILEIN)
+  do while g.0RC = 0 & pos(sSearchArg, sLine) = 0
+    sLine = getLine(g.0FILEIN)
   end
 return sLine
 
 getNextLine: procedure expose g.
-  sLine = removeWhiteSpace(getLine(g.!FILEIN))
-  do while g.!RC = 0 & (sLine = '' | left(sLine,2) = '/*')
-    sLine = removeWhiteSpace(getLine(g.!FILEIN))
+  sLine = removeWhiteSpace(getLine(g.0FILEIN))
+  do while g.0RC = 0 & (sLine = '' | left(sLine,2) = '/*')
+    sLine = removeWhiteSpace(getLine(g.0FILEIN))
   end
   if pos('/*',sLine) > 0
   then parse var sLine sLine '/*' .
@@ -1088,40 +1088,40 @@ return sLine
 setOptions: procedure expose g.
   parse upper arg sOptions
   /* set default options... */
-  g.!OPTION.DUMP     = 0
-  g.!OPTION.XML      = 0
-  g.!OPTION.RPC      = 0
-  g.!OPTION.DOCUMENT = 0
-  g.!OPTION.ENCODED  = 0
-  g.!OPTION.LITERAL  = 0
-  g.!OPTION.WRAPPED  = 0
+  g.0OPTION.DUMP     = 0
+  g.0OPTION.XML      = 0
+  g.0OPTION.RPC      = 0
+  g.0OPTION.DOCUMENT = 0
+  g.0OPTION.ENCODED  = 0
+  g.0OPTION.LITERAL  = 0
+  g.0OPTION.WRAPPED  = 0
   do i = 1 to words(sOptions)
     sOption = word(sOptions,i)
-    g.!OPTION.sOption = 1
+    g.0OPTION.sOption = 1
   end
-  if g.!OPTION.RPC | g.!OPTION.DOCUMENT |,
-     g.!OPTION.ENCODED | g.!OPTION.LITERAL | g.!OPTION.WRAPPED
+  if g.0OPTION.RPC | g.0OPTION.DOCUMENT |,
+     g.0OPTION.ENCODED | g.0OPTION.LITERAL | g.0OPTION.WRAPPED
   then nop
   else do /* Set the default style... */
-    g.!OPTION.WRAPPED  = 1
+    g.0OPTION.WRAPPED  = 1
   end
-  if g.!OPTION.WRAPPED
+  if g.0OPTION.WRAPPED
   then do
-    g.!OPTION.DOCUMENT = 1
-    g.!OPTION.LITERAL  = 1
-    g.!OPTION.RPC      = 0
-    g.!OPTION.ENCODED  = 0
+    g.0OPTION.DOCUMENT = 1
+    g.0OPTION.LITERAL  = 1
+    g.0OPTION.RPC      = 0
+    g.0OPTION.ENCODED  = 0
   end
-  if g.!OPTION.DOCUMENT then g.!OPTION.RPC = 0
-  if g.!OPTION.RPC      then g.!OPTION.DOCUMENT = 0
-  if g.!OPTION.LITERAL  then g.!OPTION.ENCODED = 0
-  if g.!OPTION.ENCODED  then g.!OPTION.LITERAL = 0
+  if g.0OPTION.DOCUMENT then g.0OPTION.RPC = 0
+  if g.0OPTION.RPC      then g.0OPTION.DOCUMENT = 0
+  if g.0OPTION.LITERAL  then g.0OPTION.ENCODED = 0
+  if g.0OPTION.ENCODED  then g.0OPTION.LITERAL = 0
 return
 
 Prolog:
-  if g.!ENV = 'TSO'
-  then g.!LF = '15'x
-  else g.!LF = '0A'x
+  if g.0ENV = 'TSO'
+  then g.0LF = '15'x
+  else g.0LF = '0A'x
   doc = createDocument('dummy') /* just to get structures in place */
 return
 

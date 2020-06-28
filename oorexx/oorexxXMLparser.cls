@@ -199,10 +199,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **                Builds a map of the attributes of the specified    **
 **                node. The map can be accessed via the following    **
 **                variables:                                         **
-**                  g.!ATTRIBUTE.0 = The number of attributes mapped.**
-**                  g.!ATTRIBUTE.n = The name of attribute 'n' (in   **
+**                  g.0ATTRIBUTE.0 = The number of attributes mapped.**
+**                  g.0ATTRIBUTE.n = The name of attribute 'n' (in   **
 **                                   order of appearance). n > 0.    **
-**                  g.!ATTRIBUTE.name = The value of the attribute   **
+**                  g.0ATTRIBUTE.name = The value of the attribute   **
 **                                   called 'name'.                  **
 **                                                                   **
 **            getAttributeName(node,n)                               **
@@ -294,18 +294,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **                Returns a number representing the specified node's **
 **                type. The possible values can be compared to the   **
 **                following global variables:                        **
-**                g.!ELEMENT_NODE                = 1                 **
-**                g.!ATTRIBUTE_NODE              = 2                 **
-**                g.!TEXT_NODE                   = 3                 **
-**                g.!CDATA_SECTION_NODE          = 4                 **
-**                g.!ENTITY_REFERENCE_NODE       = 5                 **
-**                g.!ENTITY_NODE                 = 6                 **
-**                g.!PROCESSING_INSTRUCTION_NODE = 7                 **
-**                g.!COMMENT_NODE                = 8                 **
-**                g.!DOCUMENT_NODE               = 9                 **
-**                g.!DOCUMENT_TYPE_NODE          = 10                **
-**                g.!DOCUMENT_FRAGMENT_NODE      = 11                **
-**                g.!NOTATION_NODE               = 12                **
+**                g.0ELEMENT_NODE                = 1                 **
+**                g.0ATTRIBUTE_NODE              = 2                 **
+**                g.0TEXT_NODE                   = 3                 **
+**                g.0CDATA_SECTION_NODE          = 4                 **
+**                g.0ENTITY_REFERENCE_NODE       = 5                 **
+**                g.0ENTITY_NODE                 = 6                 **
+**                g.0PROCESSING_INSTRUCTION_NODE = 7                 **
+**                g.0COMMENT_NODE                = 8                 **
+**                g.0DOCUMENT_NODE               = 9                 **
+**                g.0DOCUMENT_TYPE_NODE          = 10                **
+**                g.0DOCUMENT_FRAGMENT_NODE      = 11                **
+**                g.0NOTATION_NODE               = 12                **
 **                Note: as this exposes internal implementation      **
 **                details, it is best not to use this routine.       **
 **                Consider using isTextNode() etc instead.           **
@@ -445,32 +445,32 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **               The variables you should avoid updating yourself    **
 **               are:                                                **
 **                                                                   **
-**               g.!ATTRIBUTE.n                                      **
-**               g.!ATTRIBUTE.name                                   **
-**               g.!ATTRSOK                                          **
-**               g.!DTD                                              **
-**               g.!ENDOFDOC                                         **
-**               g.!ENTITIES                                         **
-**               g.!ENTITY.name                                      **
-**               g.!FIRST.n                                          **
-**               g.!LAST.n                                           **
-**               g.!NAME.n                                           **
-**               g.!NEXT.n                                           **
-**               g.!NEXTID                                           **
-**               g.!OPTION.name                                      **
-**               g.!OPTIONS                                          **
-**               g.!PARENT.n                                         **
-**               g.!PI                                               **
-**               g.!PI.name                                          **
-**               g.!PREV.n                                           **
-**               g.!PUBLIC                                           **
-**               g.!ROOT                                             **
-**               g.!STACK                                            **
-**               g.!SYSTEM                                           **
-**               g.!TEXT.n                                           **
-**               g.!TYPE.n                                           **
-**               g.!WHITESPACE                                       **
-**               g.!XML                                              **
+**               g.0ATTRIBUTE.n                                      **
+**               g.0ATTRIBUTE.name                                   **
+**               g.0ATTRSOK                                          **
+**               g.0DTD                                              **
+**               g.0ENDOFDOC                                         **
+**               g.0ENTITIES                                         **
+**               g.0ENTITY.name                                      **
+**               g.0FIRST.n                                          **
+**               g.0LAST.n                                           **
+**               g.0NAME.n                                           **
+**               g.0NEXT.n                                           **
+**               g.0NEXTID                                           **
+**               g.0OPTION.name                                      **
+**               g.0OPTIONS                                          **
+**               g.0PARENT.n                                         **
+**               g.0PI                                               **
+**               g.0PI.name                                          **
+**               g.0PREV.n                                           **
+**               g.0PUBLIC                                           **
+**               g.0ROOT                                             **
+**               g.0STACK                                            **
+**               g.0SYSTEM                                           **
+**               g.0TEXT.n                                           **
+**               g.0TYPE.n                                           **
+**               g.0WHITESPACE                                       **
+**               g.0XML                                              **
 **               g.?XML                                              **
 **               g.?XML.VERSION                                      **
 **               g.?XML.ENCODING                                     **
@@ -565,42 +565,42 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   /* initParser: procedure expose g. */
   parse arg sOptions
   g. = '' /* Note: stuffs up caller who may have set g. variables */
-  g.!OPTIONS = translate(sOptions)
+  g.0OPTIONS = translate(sOptions)
   sOptions = 'DEBUG DUMP NOBLANKS'
   do i = 1 to words(sOptions)
     sOption = word(sOptions,i)
-    g.!OPTION.sOption = wordpos(sOption,g.!OPTIONS) > 0
+    g.0OPTION.sOption = wordpos(sOption,g.0OPTIONS) > 0
   end
 
   parse source sSystem sInvocation sSourceFile
   select
-    when sSystem = 'WIN32'  then g.!WHITESPACE = '090a0d'x
-    when sSystem = 'TSO'    then g.!WHITESPACE = '05250d'x
-    otherwise                    g.!WHITESPACE = '090a0d'x /*20070325*/
+    when sSystem = 'WIN32'  then g.0WHITESPACE = '090a0d'x
+    when sSystem = 'TSO'    then g.0WHITESPACE = '05250d'x
+    otherwise                    g.0WHITESPACE = '090a0d'x /*20070325*/
   end
 
-  g.!ENV     = sSystem                     /*20160818*/
-  g.!LEADERS = '_:ABCDEFGHIJKLMNOPQRSTUVWXYZ' ||,
+  g.0ENV     = sSystem                     /*20160818*/
+  g.0LEADERS = '_:ABCDEFGHIJKLMNOPQRSTUVWXYZ' ||,
                  'abcdefghijklmnopqrstuvwxyz'
-  g.!OTHERS  = g.!LEADERS'.-0123456789'
+  g.0OTHERS  = g.0LEADERS'.-0123456789'
 
   self~_setDefaultEntities
 
   /* Not all of the following node types are used... */
-  g.!ELEMENT_NODE            =  1; g.!NODETYPE.1 = 'Element'
-  g.!ATTRIBUTE_NODE          =  2; g.!NODETYPE.2 = 'Attribute'
-  g.!TEXT_NODE               =  3; g.!NODETYPE.3 = 'Text'
-  g.!CDATA_SECTION_NODE      =  4; g.!NODETYPE.4 = 'CDATA Section'
-  g.!ENTITY_REFERENCE_NODE   =  5     /* NOT USED */
-  g.!ENTITY_NODE             =  6     /* NOT USED */
-  g.!PROCESSING_INSTRUCTION_NODE = 7  /* NOT USED */
-  g.!COMMENT_NODE            =  8; g.!NODETYPE.8 = 'Comment'
-  g.!DOCUMENT_NODE           =  9; g.!NODETYPE.9 = 'Document'
-  g.!DOCUMENT_TYPE_NODE      = 10    /* NOT USED */
-  g.!DOCUMENT_FRAGMENT_NODE  = 11; g.!NODETYPE.11 = 'Document Fragment'
-  g.!NOTATION_NODE           = 12    /* NOT USED */
+  g.0ELEMENT_NODE            =  1; g.0NODETYPE.1 = 'Element'
+  g.0ATTRIBUTE_NODE          =  2; g.0NODETYPE.2 = 'Attribute'
+  g.0TEXT_NODE               =  3; g.0NODETYPE.3 = 'Text'
+  g.0CDATA_SECTION_NODE      =  4; g.0NODETYPE.4 = 'CDATA Section'
+  g.0ENTITY_REFERENCE_NODE   =  5     /* NOT USED */
+  g.0ENTITY_NODE             =  6     /* NOT USED */
+  g.0PROCESSING_INSTRUCTION_NODE = 7  /* NOT USED */
+  g.0COMMENT_NODE            =  8; g.0NODETYPE.8 = 'Comment'
+  g.0DOCUMENT_NODE           =  9; g.0NODETYPE.9 = 'Document'
+  g.0DOCUMENT_TYPE_NODE      = 10    /* NOT USED */
+  g.0DOCUMENT_FRAGMENT_NODE  = 11; g.0NODETYPE.11 = 'Document Fragment'
+  g.0NOTATION_NODE           = 12    /* NOT USED */
 
-  g.!ENDOFDOC = 0
+  g.0ENDOFDOC = 0
 return
 
 /*-------------------------------------------------------------------*
@@ -614,27 +614,27 @@ return
      "g." variables...
      todo: revisit this one (parser may have to 'own' g. names)
   */
-  drop g.?XML g.!ROOT g.!SYSTEM g.!PUBLIC g.!DTD
-  do i = 1 to words(g.!PI)
-    sName = word(g.!PI,i)
-    drop g.!PI.sName
+  drop g.?XML g.0ROOT g.0SYSTEM g.0PUBLIC g.0DTD
+  do i = 1 to words(g.0PI)
+    sName = word(g.0PI,i)
+    drop g.0PI.sName
   end
-  drop g.!PI
-  do i = 1 to words(g.!ENTITIES)
-    sName = word(g.!ENTITIES,i)
-    drop g.!ENTITY.sName
+  drop g.0PI
+  do i = 1 to words(g.0ENTITIES)
+    sName = word(g.0ENTITIES,i)
+    drop g.0ENTITY.sName
   end
-  drop g.!ENTITIES
+  drop g.0ENTITIES
   self~_setDefaultEntities
   
-  if datatype(g.!NEXTID,'WHOLE')
+  if datatype(g.0NEXTID,'WHOLE')
   then do
-    do i = 1 to g.!NEXTID
-      drop g.!PARENT.i g.!FIRST.i g.!LAST.i g.!PREV.i,
-           g.!NEXT.i g.!NAME.i g.!TEXT.i
+    do i = 1 to g.0NEXTID
+      drop g.0PARENT.i g.0FIRST.i g.0LAST.i g.0PREV.i,
+           g.0NEXT.i g.0NAME.i g.0TEXT.i
     end
   end
-  drop g.!NEXTID g.!STACK g.!ENDOFDOC
+  drop g.0NEXTID g.0STACK g.0ENDOFDOC
 return
 
 
@@ -686,11 +686,11 @@ return self~parseString(sXmlData)
 ::method parseString
  expose g.
   /* parseString: procedure expose g. */
-  parse arg g.!XML
+  parse arg g.0XML
   
   self~_parseXmlDecl
-  do while pos('<',g.!XML) > 0
-    parse var g.!XML sLeft'<'sData
+  do while pos('<',g.0XML) > 0
+    parse var g.0XML sLeft'<'sData
     select
       when left(sData,1) = '?'         then self~_parsePI( sData)
       when left(sData,9) = '!DOCTYPE ' then self~_parseDocType(sData)
@@ -707,9 +707,9 @@ return 0
 ::method _parseXmlDecl private
   expose g.
   /* _parseXmlDecl: procedure expose g. */
-  if left(g.!XML,6) = '<?xml '
+  if left(g.0XML,6) = '<?xml '
   then do
-    parse var g.!XML '<?xml 'sXMLDecl'?>'g.!XML
+    parse var g.0XML '<?xml 'sXMLDecl'?>'g.0XML
     g.?xml = space(sXMLDecl)
     sTemp = self~_getNormalizedAttributes(g.?xml)
     parse var sTemp 'version='g.?xml.version'ff'x
@@ -724,7 +724,7 @@ return
 ::method _parsePI private
   expose g.
   /* _parsePI: procedure expose g. */
-  parse arg '?'sProcessingInstruction'?>'g.!XML
+  parse arg '?'sProcessingInstruction'?>'g.0XML
   self~_setProcessingInstruction(sProcessingInstruction)
 return
 
@@ -739,21 +739,21 @@ return
    expose g.
   /* _parseDocType: procedure expose g. */
   parse arg '!DOCTYPE' sDocType'>'
-  if g.!ROOT <> ''
+  if g.0ROOT <> ''
   then self~_abort('XML002E Multiple "<!DOCTYPE" declarations')
   if pos('[',sDocType) > 0
   then do
-    parse arg '!DOCTYPE' sDocType'['g.!DTD']>'g.!XML
-    parse var sDocType g.!ROOT sExternalId
+    parse arg '!DOCTYPE' sDocType'['g.0DTD']>'g.0XML
+    parse var sDocType g.0ROOT sExternalId
     if sExternalId <> '' then self~_parseExternalId(sExternalId)
-    g.!DTD = strip(g.!DTD)
-    self~_parseDTD(g.!DTD)
+    g.0DTD = strip(g.0DTD)
+    self~_parseDTD(g.0DTD)
   end
   else do
-    parse arg '!DOCTYPE' g.!ROOT sExternalId'>'g.!XML
+    parse arg '!DOCTYPE' g.0ROOT sExternalId'>'g.0XML
     if sExternalId <> '' then self~_parseExternalId(sExternalId)
   end
-  g.!ROOT = strip(g.!ROOT)
+  g.0ROOT = strip(g.0ROOT)
 return
 
 /*-------------------------------------------------------------------*
@@ -766,13 +766,13 @@ return
   parse arg sExternalIdType .
   select
     when sExternalIdType = 'SYSTEM' then do
-      parse arg . g.!SYSTEM
-      g.!SYSTEM = self~removeQuotes(g.!SYSTEM)
+      parse arg . g.0SYSTEM
+      g.0SYSTEM = self~removeQuotes(g.0SYSTEM)
     end
     when sExternalIdType = 'PUBLIC' then do
-      parse arg . g.!PUBLIC g.!SYSTEM
-      g.!PUBLIC = self~removeQuotes(g.!PUBLIC)
-      g.!SYSTEM = self~removeQuotes(g.!SYSTEM)
+      parse arg . g.0PUBLIC g.0SYSTEM
+      g.0PUBLIC = self~removeQuotes(g.0PUBLIC)
+      g.0SYSTEM = self~removeQuotes(g.0SYSTEM)
     end
     otherwise do
        parse arg sExternalEntityDecl
@@ -822,7 +822,7 @@ return
 ::method _parseComment private
    expose g.
   /* _parseComment: procedure expose g. */
-  parse arg sComment'-->'g.!XML
+  parse arg sComment'-->'g.0XML
   /* silently ignore comments */
 return
 
@@ -835,25 +835,25 @@ return
   /* _parseElement: procedure expose g. */
   parse arg sXML
 
-  if g.!ENDOFDOC
+  if g.0ENDOFDOC
   then self~_abort('XML004E Only one top level element is allowed.',
-                  'Found:' subword(g.!XML,1,3))
+                  'Found:' subword(g.0XML,1,3))
   self~_startDocument
 
-  g.!XML = '<'sXML
-  do while pos('<',g.!XML) > 0 & \g.!ENDOFDOC
-    parse var g.!XML sLeft'<'sBetween'>'g.!XML
+  g.0XML = '<'sXML
+  do while pos('<',g.0XML) > 0 & \g.0ENDOFDOC
+    parse var g.0XML sLeft'<'sBetween'>'g.0XML
 
     if length(sLeft) > 0
     then self~_characters(sLeft)
 
-    if g.!OPTION.DEBUG
-    then say g.!STACK sBetween
+    if g.0OPTION.DEBUG
+    then say g.0STACK sBetween
 
     if left(sBetween,8) = '![CDATA[' 
     then do
-      g.!XML = sBetween'>'g.!XML            /* ..back it out! */
-      parse var g.!XML '![CDATA['sBetween']]>'g.!XML
+      g.0XML = sBetween'>'g.0XML            /* ..back it out! */
+      parse var g.0XML '![CDATA['sBetween']]>'g.0XML
       self~_characterData(sBetween)
     end
     else do
@@ -862,11 +862,11 @@ return
         when left(sBetween,3) = '!--' then do    /* <!-- comment --> */
           if right(sBetween,2) <> '--'
           then do  /* backup a bit and look for end-of-comment */
-            g.!XML = sBetween'>'g.!XML
-            if pos('-->',g.!XML) = 0
+            g.0XML = sBetween'>'g.0XML
+            if pos('-->',g.0XML) = 0
             then self~_abort('XML005E End of comment missing after:',
-                            '<'g.!XML)
-            parse var g.!XML sComment'-->'g.!XML
+                            '<'g.0XML)
+            parse var g.0XML sComment'-->'g.0XML
           end
         end
         when left(sBetween,1) = '?' then do    /* <?target string?> */
@@ -889,13 +889,13 @@ return
         otherwise do              /* <tag ...attrs ...> ... </tag>  */
           parse var sBetween sTagName sAttrs
           sAttrs = self~_getNormalizedAttributes(sAttrs)
-          if g.!ATTRSOK
+          if g.0ATTRSOK
           then do
             self~_startElement(sTagName,sAttrs)
           end
           else do /* back up a bit and look for the real end of tag */
-            g.!XML = '<'sBetween'&gt;'g.!XML
-            if pos('>',g.!XML) = 0
+            g.0XML = '<'sBetween'&gt;'g.0XML
+            if pos('>',g.0XML) = 0
             then self~_abort('XML006E Missing end tag for:' sTagName)
             /* reparse on next cycle avoiding premature '>'...*/
           end
@@ -910,8 +910,8 @@ return
 ::method _startDocument private
   expose g.
   /* _startDocument: procedure expose g. */
-  g.!NEXTID = 0
-  g.!STACK = 0
+  g.0NEXTID = 0
+  g.0STACK = 0
 return
 
 ::method _startElement  private
@@ -920,8 +920,8 @@ return
   parse arg sTagName,sAttrs
   id = self~_getNextId()
   self~_updateLinkage(id)
-  g.!NAME.id = sTagName
-  g.!TYPE.id = g.!ELEMENT_NODE
+  g.0NAME.id = sTagName
+  g.0TYPE.id = g.0ELEMENT_NODE
   self~_addAttributes(id,sAttrs)
   cid = self~_pushElement(id)
 return
@@ -931,13 +931,13 @@ return
   /* _updateLinkage: procedure expose g. */
   parse arg id
   parent = self~_peekElement()
-  g.!PARENT.id = parent
-  parentsLastChild = g.!LAST.parent
-  g.!NEXT.parentsLastChild = id
-  g.!PREV.id = parentsLastChild
-  g.!LAST.parent = id
-  if g.!FIRST.parent = ''
-  then g.!FIRST.parent = id
+  g.0PARENT.id = parent
+  parentsLastChild = g.0LAST.parent
+  g.0NEXT.parentsLastChild = id
+  g.0PREV.id = parentsLastChild
+  g.0LAST.parent = id
+  if g.0FIRST.parent = ''
+  then g.0FIRST.parent = id
 return
 
 ::method _characterData private
@@ -947,8 +947,8 @@ return
   parse arg sChars
   id = self~_getNextId()
   self~_updateLinkage(id)
-  g.!TEXT.id = sChars
-  g.!TYPE.id = g.!CDATA_SECTION_NODE
+  g.0TEXT.id = sChars
+  g.0TYPE.id = g.0CDATA_SECTION_NODE
 return
 
 ::method _characters private
@@ -956,12 +956,12 @@ return
   /* _characters: procedure expose g. */
   parse arg sChars
   sText = self~_resolveEntities(sChars)
-  if g.!OPTION.NOBLANKS & self~removeWhitespace(sText) = ''
+  if g.0OPTION.NOBLANKS & self~removeWhitespace(sText) = ''
   then return
   id = self~_getNextId()
   self~_updateLinkage(id)
-  g.!TEXT.id = sText
-  g.!TYPE.id = g.!TEXT_NODE
+  g.0TEXT.id = sText
+  g.0TYPE.id = g.0TEXT_NODE
 return
 
 ::method _endElement private
@@ -970,11 +970,11 @@ return
   /* _endElement: procedure expose g. */
   parse arg sTagName
   id = self~_popElement()
-  g.!ENDOFDOC = id = 1
-  if sTagName == g.!NAME.id
+  g.0ENDOFDOC = id = 1
+  if sTagName == g.0NAME.id
   then nop
   else self~_abort(,
-           'XML007E Expecting </'g.!NAME.id'> but found </'sTagName'>')
+           'XML007E Expecting </'g.0NAME.id'> but found </'sTagName'>')
 return
 
 ::method _endDocument private
@@ -983,12 +983,12 @@ return
   id = self~_peekElement()
   if id <> 0
   then self~_abort('XML008E End of document tag missing: 'id self~getName(id))
-  if g.!ROOT <> '' & g.!ROOT <> self~getName(self~getRoot())
+  if g.0ROOT <> '' & g.0ROOT <> self~getName(self~getRoot())
   then self~_abort(,
                   'XML009E Root element name "'self~getName(self~getRoot())'"',
-                  'does not match DTD root "'g.!ROOT'"')
+                  'does not match DTD root "'g.0ROOT'"')
 
-  if g.!OPTION.DUMP
+  if g.0OPTION.DUMP
   then self~_displayTree
 return
 
@@ -1012,25 +1012,25 @@ return
         right('next',4),
         right('1st',4),
         right('last',4)
-  do id = 1 to g.!NEXTID
-    if g.!PARENT.id <> '' | id = 1 /* skip orphans */
+  do id = 1 to g.0NEXTID
+    if g.0PARENT.id <> '' | id = 1 /* skip orphans */
     then do
       select
-        when g.!TYPE.id = g.!CDATA_SECTION_NODE then sName = '#CDATA'
-        when g.!TYPE.id = g.!TEXT_NODE          then sName = '#TEXT'
-        otherwise                                    sName = g.!NAME.id
+        when g.0TYPE.id = g.0CDATA_SECTION_NODE then sName = '#CDATA'
+        when g.0TYPE.id = g.0TEXT_NODE          then sName = '#TEXT'
+        otherwise                                    sName = g.0NAME.id
       end
       say right(id,4),
-          right(g.!TYPE.id,4),
+          right(g.0TYPE.id,4),
           left(sName,12),
-          right(g.!PARENT.id,6),
-          right(g.!FIRST.id,4),
-          right(g.!LAST.id,4),
-          right(g.!PREV.id,4),
-          right(g.!NEXT.id,4),
-          right(g.!FIRSTATTR.id,4),
-          right(g.!LASTATTR.id,4),
-          left(self~removeWhitespace(g.!TEXT.id),19)
+          right(g.0PARENT.id,6),
+          right(g.0FIRST.id,4),
+          right(g.0LAST.id,4),
+          right(g.0PREV.id,4),
+          right(g.0NEXT.id,4),
+          right(g.0FIRSTATTR.id,4),
+          right(g.0LASTATTR.id,4),
+          left(self~removeWhitespace(g.0TEXT.id),19)
     end
   end
 return
@@ -1039,37 +1039,37 @@ return
   expose g.
   /* _pushElement: procedure expose g. */
   parse arg id
-  g.!STACK = g.!STACK + 1
-  nStackDepth = g.!STACK
-  g.!STACK.nStackDepth = id
+  g.0STACK = g.0STACK + 1
+  nStackDepth = g.0STACK
+  g.0STACK.nStackDepth = id
 return id
 
 ::method _popElement private
   expose g.
   /* _popElement: procedure expose g. */
-  n = g.!STACK
+  n = g.0STACK
   if n = 0
   then id = 0
   else do
-    id = g.!STACK.n
-    g.!STACK = g.!STACK - 1
+    id = g.0STACK.n
+    g.0STACK = g.0STACK - 1
   end
 return id
 
 ::method _peekElement private
   expose g.
   /* _peekElement: procedure expose g. */
-  n = g.!STACK
+  n = g.0STACK
   if n = 0
   then id = 0
-  else id = g.!STACK.n
+  else id = g.0STACK.n
 return id
 
 ::method _getNextId private
   expose g.
   /* _getNextId: procedure expose g. */
-  g.!NEXTID = g.!NEXTID + 1
-return g.!NEXTID
+  g.0NEXTID = g.0NEXTID + 1
+return g.0NEXTID
 
 ::method _addAttributes private
   expose g.
@@ -1087,20 +1087,20 @@ return
   /* _addAttribute: procedure expose g. */
   parse arg id,sAttrName,sAttrValue
   aid = self~_getNextId()
-  g.!TYPE.aid = g.!ATTRIBUTE_NODE
-  g.!NAME.aid = sAttrName
-  g.!TEXT.aid = self~_resolveEntities(sAttrValue)
-  g.!PARENT.aid = id
-  g.!NEXT.aid = ''
-  g.!PREV.aid = ''
-  if g.!FIRSTATTR.id = '' then g.!FIRSTATTR.id = aid
-  if g.!LASTATTR.id <> ''
+  g.0TYPE.aid = g.0ATTRIBUTE_NODE
+  g.0NAME.aid = sAttrName
+  g.0TEXT.aid = self~_resolveEntities(sAttrValue)
+  g.0PARENT.aid = id
+  g.0NEXT.aid = ''
+  g.0PREV.aid = ''
+  if g.0FIRSTATTR.id = '' then g.0FIRSTATTR.id = aid
+  if g.0LASTATTR.id <> ''
   then do
-    lastaid = g.!LASTATTR.id
-    g.!NEXT.lastaid = aid
-    g.!PREV.aid = lastaid
+    lastaid = g.0LASTATTR.id
+    g.0NEXT.lastaid = aid
+    g.0PREV.aid = lastaid
   end
-  g.!LASTATTR.id = aid
+  g.0LASTATTR.id = aid
 return
 
 /*-------------------------------------------------------------------*
@@ -1114,7 +1114,7 @@ return
   
   /* _getNormalizedAttributes: procedure expose g. */
   parse arg sAttrs
-  g.!ATTRSOK = 0
+  g.0ATTRSOK = 0
   sNormalAttrs = ''
   parse var sAttrs sAttr'='sAttrs
   do while sAttr <> ''
@@ -1136,7 +1136,7 @@ return
     sNormalAttrs = sNormalAttrs sAttr'='sAttrValue'ff'x
     parse var sAttrs sAttr'='sAttrs
   end
-  g.!ATTRSOK = 1
+  g.0ATTRSOK = 1
   /* Note: always returns a leading blank and is required by
     this implementation */
 return self~_resolveEntities(sNormalAttrs)
@@ -1155,9 +1155,9 @@ return self~_resolveEntities(sNormalAttrs)
     sNewText = ''
     do while pos('&',sText) > 0
       parse var sText sLeft'&'sEntityRef
-      if pos(left(sEntityRef,1),'#'g.!LEADERS) > 0
+      if pos(left(sEntityRef,1),'#'g.0LEADERS) > 0
       then do
-        n = verify(sEntityRef,g.!OTHERS,'NOMATCH',2)
+        n = verify(sEntityRef,g.0OTHERS,'NOMATCH',2)
         if n > 1
         then do
           if substr(sEntityRef,n,1) = ';'
@@ -1235,21 +1235,21 @@ return sEntity
 
    /* _getStringEntity: procedure expose g. */
   parse arg sEntityName
-  if wordpos(sEntityName,g.!ENTITIES) = 0
+  if wordpos(sEntityName,g.0ENTITIES) = 0
   then self~_abort('XML012E Unable to resolve entity &'sEntityName';')
-  sEntity = g.!ENTITY.sEntityName
+  sEntity = g.0ENTITY.sEntityName
 return sEntity
 
 ::method _setDefaultEntities private
   expose g.
 
   /* _setDefaultEntities: procedure expose g. */
-  g.!ENTITIES = ''
-  g.!ESCAPES = '<>&"' || "'"
+  g.0ENTITIES = ''
+  g.0ESCAPES = '<>&"' || "'"
   sEscapes = 'lt gt amp quot apos'
-  do i = 1 to length(g.!ESCAPES)
-    c = substr(g.!ESCAPES,i,1)
-    g.!ESCAPE.c = word(sEscapes,i)
+  do i = 1 to length(g.0ESCAPES)
+    c = substr(g.0ESCAPES,i,1)
+    g.0ESCAPE.c = word(sEscapes,i)
   end
   self~_setEntity('amp','&')
   self~_setEntity('lt','<')
@@ -1262,18 +1262,18 @@ return
   expose g.
   /* _setEntity: procedure expose g. */
   parse arg sEntityName,sValue
-  if wordpos(sEntityName,g.!ENTITIES) = 0
-  then g.!ENTITIES = g.!ENTITIES sEntityName
-  g.!ENTITY.sEntityName = sValue
+  if wordpos(sEntityName,g.0ENTITIES) = 0
+  then g.0ENTITIES = g.0ENTITIES sEntityName
+  g.0ENTITY.sEntityName = sValue
 return
 
 ::method _setProcessingInstruction private
   expose g.
   /* _setProcessingInstruction: procedure expose g. */
   parse arg sTarget sInstruction
-  if wordpos(sTarget,g.!PI) = 0
-  then g.!PI = g.!PI sTarget
-  g.!PI.sTarget = strip(sInstruction)
+  if wordpos(sTarget,g.0PI) = 0
+  then g.0PI = g.0PI sTarget
+  g.0PI.sTarget = strip(sInstruction)
 return
 
 ::method _abort private
@@ -1288,16 +1288,16 @@ exit 16
   expose g.
   /* _clearNode: procedure expose g. */
   parse arg id
-  g.!NAME.id       = '' /* The node's name */
-  g.!PARENT.id     = '' /* The node's parent */
-  g.!FIRST.id      = '' /* The node's first child */
-  g.!LAST.id       = '' /* The node's last child */
-  g.!NEXT.id       = '' /* The node's next sibling */
-  g.!PREV.id       = '' /* The node's previous sibling */
-  g.!TEXT.id       = '' /* The node's text content */
-  g.!TYPE.id       = '' /* The node's type */
-  g.!FIRSTATTR.id  = '' /* The node's first attribute */
-  g.!LASTATTR.id   = '' /* The node's last attribute */
+  g.0NAME.id       = '' /* The node's name */
+  g.0PARENT.id     = '' /* The node's parent */
+  g.0FIRST.id      = '' /* The node's first child */
+  g.0LAST.id       = '' /* The node's last child */
+  g.0NEXT.id       = '' /* The node's next sibling */
+  g.0PREV.id       = '' /* The node's previous sibling */
+  g.0TEXT.id       = '' /* The node's text content */
+  g.0TYPE.id       = '' /* The node's type */
+  g.0FIRSTATTR.id  = '' /* The node's first attribute */
+  g.0LASTATTR.id   = '' /* The node's last attribute */
 return
 
 /*-------------------------------------------------------------------*
@@ -1307,7 +1307,7 @@ return
   expose g.
   /* removeWhitespace: procedure expose g. */
   parse arg sData
-return space(translate(sData,'',g.!WHITESPACE))
+return space(translate(sData,'',g.0WHITESPACE))
 
 ::method removeQuotes
   expose g.
@@ -1338,97 +1338,97 @@ return 1
   expose g.
   /* getName: getNodeName: procedure expose g. */
   parse arg id
-return g.!NAME.id
+return g.0NAME.id
 ::method getNodeName
   expose g.
   parse arg id
-return g.!NAME.id
+return g.0NAME.id
 
 ::method getText
   expose g.
   /* getText: getNodeValue: procedure expose g. */
   parse arg id
-return g.!TEXT.id
+return g.0TEXT.id
 
 ::method getNodeValue
   expose g.
   parse arg id
-return g.!TEXT.id
+return g.0TEXT.id
 
 ::method getNodeType
  expose g.
   /* getNodeType: procedure expose g. */
   parse arg id
-return g.!TYPE.id
+return g.0TYPE.id
 
 ::method isElementNode
   expose g.
   /* isElementNode: procedure expose g. */
   parse arg id
-return g.!TYPE.id = g.!ELEMENT_NODE
+return g.0TYPE.id = g.0ELEMENT_NODE
 
 ::method isTextNode
   expose g.
   /* isTextNode: procedure expose g. */
   parse arg id
-return g.!TYPE.id = g.!TEXT_NODE
+return g.0TYPE.id = g.0TEXT_NODE
 
 ::method isCommentNode
   expose g.
   /* isCommentNode: procedure expose g. */
   parse arg id
-return g.!TYPE.id = g.!COMMENT_NODE
+return g.0TYPE.id = g.0COMMENT_NODE
 
 ::method isCDATA
   expose g.
   /* isCDATA: procedure expose g. */
   parse arg id
-return g.!TYPE.id = g.!CDATA_SECTION_NODE
+return g.0TYPE.id = g.0CDATA_SECTION_NODE
 
 ::method isDocumentNode
   expose g.
   /* isDocumentNode: procedure expose g. */
   parse arg id
-return g.!TYPE.id = g.!DOCUMENT_NODE
+return g.0TYPE.id = g.0DOCUMENT_NODE
 
 ::method isDocumentFragmentNode
   expose g.
   /* isDocumentFragmentNode: procedure expose g. */
   parse arg id
-return g.!TYPE.id = g.!DOCUMENT_FRAGMENT_NODE
+return g.0TYPE.id = g.0DOCUMENT_FRAGMENT_NODE
 
 /**
  * This is similar to the DOM API's NamedNodeMap concept, except that
  * the returned structure is built in global variables (so calling
  * it a second time will destroy the structure built on the first
  * call). The other difference is that you can access the attributes
- * by name or ordinal number. For example, g.!ATTRIBUTE.2 is the value
+ * by name or ordinal number. For example, g.0ATTRIBUTE.2 is the value
  * of the second attribute. If the second attribute was called 'x',
- * then you could also access it by g.!ATTRIBUTE.x (as long as x='x')
- * Note, g.!ATTRIBUTE.0 will always contain a count of the number of
+ * then you could also access it by g.0ATTRIBUTE.x (as long as x='x')
+ * Note, g.0ATTRIBUTE.0 will always contain a count of the number of
  * attributes in the map.
  */
 ::method getAttributeMap
   expose g.
   /* getAttributeMap: procedure expose g. */
   parse arg id
-  if datatype(g.!ATTRIBUTE.0,'WHOLE')  /* clear any existing map */
+  if datatype(g.0ATTRIBUTE.0,'WHOLE')  /* clear any existing map */
   then do
-    do i = 1 to g.!ATTRIBUTE.0
-      sName = g.!ATTRIBUTE.i
-      drop g.!ATTRIBUTE.sName g.!ATTRIBUTE.i
+    do i = 1 to g.0ATTRIBUTE.0
+      sName = g.0ATTRIBUTE.i
+      drop g.0ATTRIBUTE.sName g.0ATTRIBUTE.i
     end
   end
-  g.!ATTRIBUTE.0 = 0
+  g.0ATTRIBUTE.0 = 0
   if \self~_canHaveAttributes(id) then return
-  aid = g.!FIRSTATTR.id /* id of first attribute of element 'id' */
+  aid = g.0FIRSTATTR.id /* id of first attribute of element 'id' */
   do i = 1 while aid <> ''
-    sName = g.!NAME.aid
-    sValue = g.!TEXT.aid
-    g.!ATTRIBUTE.0 = i
-    g.!ATTRIBUTE.i = sName
-    g.!ATTRIBUTE.sName = sValue
-    aid = g.!NEXT.aid /* id of next attribute */
+    sName = g.0NAME.aid
+    sValue = g.0TEXT.aid
+    g.0ATTRIBUTE.0 = i
+    g.0ATTRIBUTE.i = sName
+    g.0ATTRIBUTE.sName = sValue
+    aid = g.0NEXT.aid /* id of next attribute */
   end
 return
 
@@ -1439,10 +1439,10 @@ return
   nAttributeCount = 0
   if self~_canHaveAttributes(id)
   then do
-    aid = g.!FIRSTATTR.id /* id of first attribute of element 'id' */
+    aid = g.0FIRSTATTR.id /* id of first attribute of element 'id' */
     do while aid <> ''
       nAttributeCount = nAttributeCount + 1
-      aid = g.!NEXT.aid /* id of next attribute */
+      aid = g.0NEXT.aid /* id of next attribute */
     end
   end
 return nAttributeCount
@@ -1454,10 +1454,10 @@ return nAttributeCount
   sNames = ''
   if self~_canHaveAttributes(id)
   then do
-    aid = g.!FIRSTATTR.id /* id of first attribute of element 'id' */
+    aid = g.0FIRSTATTR.id /* id of first attribute of element 'id' */
     do while aid <> ''
-      sNames = sNames g.!NAME.aid
-      aid = g.!NEXT.aid /* id of next attribute */
+      sNames = sNames g.0NAME.aid
+      aid = g.0NEXT.aid /* id of next attribute */
     end
   end
 return strip(sNames)
@@ -1469,16 +1469,16 @@ return strip(sNames)
   sValue = ''
   if self~_canHaveAttributes(id)
   then do
-    aid = g.!FIRSTATTR.id /* id of first attribute of element 'id' */
+    aid = g.0FIRSTATTR.id /* id of first attribute of element 'id' */
     if aid <> ''
     then do
       n = 1
-      do while aid <> '' & (g.!NAME.aid <> sAttrName & n <> sAttrName)
-        aid = g.!NEXT.aid
+      do while aid <> '' & (g.0NAME.aid <> sAttrName & n <> sAttrName)
+        aid = g.0NEXT.aid
         n = n + 1
       end
-      if g.!NAME.aid = sAttrName | n = sAttrName
-      then sValue = g.!TEXT.aid
+      if g.0NAME.aid = sAttrName | n = sAttrName
+      then sValue = g.0TEXT.aid
     end
   end
 return sValue
@@ -1490,13 +1490,13 @@ return sValue
   sName = ''
   if self~_canHaveAttributes(id)
   then do
-    aid = g.!FIRSTATTR.id /* id of first attribute of element 'id' */
+    aid = g.0FIRSTATTR.id /* id of first attribute of element 'id' */
     if aid <> ''
     then do
       do i = 1 while aid <> '' & i < n
-        aid = g.!NEXT.aid
+        aid = g.0NEXT.aid
       end
-      if i = n then sName = g.!NAME.aid
+      if i = n then sName = g.0NAME.aid
     end
   end
 return sName
@@ -1508,13 +1508,13 @@ return sName
   bHasAttribute = 0
   if self~_canHaveAttributes(id)
   then do
-    aid = g.!FIRSTATTR.id
+    aid = g.0FIRSTATTR.id
     if aid <> ''
     then do
-      do while aid <> '' & g.!NAME.aid <> sAttrName
-        aid = g.!NEXT.aid
+      do while aid <> '' & g.0NAME.aid <> sAttrName
+        aid = g.0NEXT.aid
       end
-      bHasAttribute = g.!NAME.aid = sAttrName
+      bHasAttribute = g.0NAME.aid = sAttrName
     end
   end
 return bHasAttribute
@@ -1523,39 +1523,39 @@ return bHasAttribute
   expose g.
   /* _canHaveAttributes: procedure expose g. */
   parse arg id
-return g.!TYPE.id = g.!ELEMENT_NODE |,
-       g.!TYPE.id = g.!DOCUMENT_NODE |,
-       g.!TYPE.id = g.!DOCUMENT_FRAGMENT_NODE
+return g.0TYPE.id = g.0ELEMENT_NODE |,
+       g.0TYPE.id = g.0DOCUMENT_NODE |,
+       g.0TYPE.id = g.0DOCUMENT_FRAGMENT_NODE
 
 ::method _canHaveChildren private
   expose g.
   /* _canHaveChildren: procedure expose g. */
   parse arg id
-return g.!TYPE.parent <> g.!ELEMENT_NODE &,
-       g.!TYPE.parent <> g.!DOCUMENT_NODE &,
-       g.!TYPE.parent <> g.!DOCUMENT_FRAGMENT_NODE
+return g.0TYPE.parent <> g.0ELEMENT_NODE &,
+       g.0TYPE.parent <> g.0DOCUMENT_NODE &,
+       g.0TYPE.parent <> g.0DOCUMENT_FRAGMENT_NODE
 
 ::method getParent  
   expose g.
   parse arg id
-return g.!PARENT.id
+return g.0PARENT.id
 ::method getParentNode
   expose g.
 
   parse arg id
-return g.!PARENT.id
+return g.0PARENT.id
 
 ::method getFirstChild
   expose g.
   /* getFirstChild: procedure expose g. */
   parse arg id
-return g.!FIRST.id
+return g.0FIRST.id
 
 ::method getLastChild
   expose g.
   /* getLastChild: procedure expose g. */
   parse arg id
-return g.!LAST.id
+return g.0LAST.id
 
 ::method getChildren
   expose g.
@@ -1605,37 +1605,37 @@ return space(ids)
   expose g.
   /* getNextSibling: procedure expose g. */
   parse arg id
-return g.!NEXT.id
+return g.0NEXT.id
 
 ::method getPreviousSibling
   expose g.
   /* getPreviousSibling: procedure expose g. */
   parse arg id
-return g.!PREV.id
+return g.0PREV.id
 
 ::method getProcessingInstruction
   expose g.
   /* getProcessingInstruction: procedure expose g. */
   parse arg sTarget
-return g.!PI.sTarget
+return g.0PI.sTarget
 
 ::method getProcessingInstructionList
   expose g.
   /* getProcessingInstructionList: procedure expose g. */
-return g.!PI
+return g.0PI
 
 ::method hasChildren
   expose g.
   
   /* hasChildren: hasChildNodes: procedure expose g. */
   parse arg id
-return g.!FIRST.id <> ''
+return g.0FIRST.id <> ''
   
 ::method hasChildNodes
   expose g.
   /* hasChildren: hasChildNodes: procedure expose g. */
   parse arg id
-return g.!FIRST.id <> ''
+return g.0FIRST.id <> ''
 
 ::method createDocument
   expose g.
@@ -1646,12 +1646,12 @@ return g.!FIRST.id <> ''
             'XML013E Tag name omitted:',
             'createDocument('sName')')
   self~destroyParser
-  g.!NEXTID = 0
+  g.0NEXTID = 0
   id = self~_getNextId()
   self~_clearNode(id)
-  g.!TYPE.id = g.!DOCUMENT_NODE /* 20070323 */
-  g.!NAME.id = sName
-  g.!PARENT.id = 0
+  g.0TYPE.id = g.0DOCUMENT_NODE /* 20070323 */
+  g.0NAME.id = sName
+  g.0PARENT.id = 0
 return id
 
 ::method createDocumentFragment
@@ -1664,9 +1664,9 @@ return id
             'createDocumentFragment('sName')')
   id = self~_getNextId()
   self~_clearNode(id)
-  g.!TYPE.id = g.!DOCUMENT_FRAGMENT_NODE
-  g.!NAME.id = sName
-  g.!PARENT.id = 0
+  g.0TYPE.id = g.0DOCUMENT_FRAGMENT_NODE
+  g.0NAME.id = sName
+  g.0PARENT.id = 0
 return id
 
 ::method createElement
@@ -1675,8 +1675,8 @@ return id
   parse arg sName
   id = self_getNextId()
   self~_clearNode(id)
-  g.!TYPE.id = g.!ELEMENT_NODE
-  g.!NAME.id = sName
+  g.0TYPE.id = g.0ELEMENT_NODE
+  g.0NAME.id = sName
 return id
 
 ::method createCDATASection
@@ -1685,8 +1685,8 @@ return id
   parse arg sCharacterData
   id = self~_getNextId()
   self~_clearNode(id)
-  g.!TYPE.id = g.!CDATA_SECTION_NODE
-  g.!TEXT.id = sCharacterData
+  g.0TYPE.id = g.0CDATA_SECTION_NODE
+  g.0TEXT.id = sCharacterData
 return id
 
 ::method createTextNode
@@ -1695,8 +1695,8 @@ return id
   parse arg sData
   id = self~_getNextId()
   self~_clearNode(id)
-  g.!TYPE.id = g.!TEXT_NODE
-  g.!TEXT.id = sData
+  g.0TYPE.id = g.0TEXT_NODE
+  g.0TEXT.id = sData
 return id
 
 ::method appendChild
@@ -1705,84 +1705,84 @@ return id
   parse arg id, parent
   if \self~_canHaveChildren(parent)
   then self~_abort(,
-            'XML015E' g.!NODETYPE.parent 'node cannot have children:',
+            'XML015E' g.0NODETYPE.parent 'node cannot have children:',
             'appendChild('id','parent')')
-  if g.!PARENT.id = ''
-  then g.!PARENT.id = parent
+  if g.0PARENT.id = ''
+  then g.0PARENT.id = parent
   else self~_abort(,
             'XML016E Node <'self~getNodeName(id)'> is already a child',
-            'of <'self~getNodeName(g.!PARENT.id)'>:',
+            'of <'self~getNodeName(g.0PARENT.id)'>:',
             'appendChild('id','parent')')
-  parentsLastChild = g.!LAST.parent
-  g.!NEXT.parentsLastChild = id
-  g.!PREV.id = parentsLastChild
-  g.!LAST.parent = id
-  if g.!FIRST.parent = ''
-  then g.!FIRST.parent = id
+  parentsLastChild = g.0LAST.parent
+  g.0NEXT.parentsLastChild = id
+  g.0PREV.id = parentsLastChild
+  g.0LAST.parent = id
+  if g.0FIRST.parent = ''
+  then g.0FIRST.parent = id
 return
 
 ::method insertBefore
   expose g.
   /* insertBefore: procedure expose g. */
   parse arg id, ref
-  parent = g.!PARENT.ref
+  parent = g.0PARENT.ref
   if \self~_canHaveChildren(parent)
   then self~_abort(,
-            'XML017E' g.!NODETYPE.parent 'node cannot have children:',
+            'XML017E' g.0NODETYPE.parent 'node cannot have children:',
             'insertBefore('id','ref')')
-  if g.!PARENT.id = ''
-  then g.!PARENT.id = parent
+  if g.0PARENT.id = ''
+  then g.0PARENT.id = parent
   else self~_abort(,
             'XML018E Node <'self~getNodeName(id)'> is already a child',
-            'of <'self~getNodeName(g.!PARENT.id)'>:',
+            'of <'self~getNodeName(g.0PARENT.id)'>:',
             'insertBefore('id','ref')')
-  g.!NEXT.id = ref
-  g.!PREV.ref = id
-  if g.!FIRST.parent = ref
-  then g.!FIRST.parent = id
+  g.0NEXT.id = ref
+  g.0PREV.ref = id
+  if g.0FIRST.parent = ref
+  then g.0FIRST.parent = id
 return
 
 ::method removeChild
   expose g.
   /* removeChild: procedure expose g. */
   parse arg id
-  parent = g.!PARENT.id
+  parent = g.0PARENT.id
   if \self~_canHaveChildren(parent)
   then self~_abort(,
-            'XML019E' g.!NODETYPE.parent 'node cannot have children:',
+            'XML019E' g.0NODETYPE.parent 'node cannot have children:',
             'removeChild('id')')
-  next = g.!NEXT.id
-  prev = g.!PREV.id
-  g.!NEXT.prev = next
-  g.!PREV.next = prev
-  if g.!FIRST.parent = id
-  then g.!FIRST.parent = next
-  if g.!LAST.parent = id
-  then g.!LAST.parent = prev
-  g.!PARENT.id = ''
-  g.!NEXT.id = ''
-  g.!PREV.id = ''
+  next = g.0NEXT.id
+  prev = g.0PREV.id
+  g.0NEXT.prev = next
+  g.0PREV.next = prev
+  if g.0FIRST.parent = id
+  then g.0FIRST.parent = next
+  if g.0LAST.parent = id
+  then g.0LAST.parent = prev
+  g.0PARENT.id = ''
+  g.0NEXT.id = ''
+  g.0PREV.id = ''
 return id
 
 ::method replaceChild
   expose g.
   /* replaceChild: procedure expose g. */
   parse arg id, extant
-  parent = g.!PARENT.extant
+  parent = g.0PARENT.extant
   if \self~_canHaveChildren(parent)
   then self~_abort(,
-            'XML020E' g.!NODETYPE.parent 'node cannot have children:',
+            'XML020E' g.0NODETYPE.parent 'node cannot have children:',
             'replaceChild('id','extant')')
-  g.!PARENT.id = parent
-  g.!NEXT.id = g.!NEXT.extant
-  g.!PREV.id = g.!PREV.extant
-  if g.!FIRST.parent = extant
-  then g.!FIRST.parent = id
-  if g.!LAST.parent = extant
-  then g.!LAST.parent = id
-  g.!PARENT.extant = ''
-  g.!NEXT.extant = ''
-  g.!PREV.extant = ''
+  g.0PARENT.id = parent
+  g.0NEXT.id = g.0NEXT.extant
+  g.0PREV.id = g.0PREV.extant
+  if g.0FIRST.parent = extant
+  then g.0FIRST.parent = id
+  if g.0LAST.parent = extant
+  then g.0LAST.parent = id
+  g.0PARENT.extant = ''
+  g.0NEXT.extant = ''
+  g.0PREV.extant = ''
 return extant
 
 ::method setAttribute
@@ -1791,14 +1791,14 @@ return extant
   parse arg id,sAttrName,sValue
   if \self~_canHaveAttributes(id)
   then self~_abort(,
-            'XML021E' g.!NODETYPE.id 'node cannot have attributes:',
+            'XML021E' g.0NODETYPE.id 'node cannot have attributes:',
             'setAttribute('id','sAttrName','sValue')')
-  aid = g.!FIRSTATTR.id
-  do while aid <> '' & g.!NAME.aid <> sAttrName
-    aid = g.!NEXT.aid
+  aid = g.0FIRSTATTR.id
+  do while aid <> '' & g.0NAME.aid <> sAttrName
+    aid = g.0NEXT.aid
   end
-  if aid <> '' & g.!NAME.aid = sAttrName
-  then g.!TEXT.aid = sValue
+  if aid <> '' & g.0NAME.aid = sAttrName
+  then g.0TEXT.aid = sValue
   else self~_addAttribute(id,sAttrName,sValue)
 return
 
@@ -1819,22 +1819,22 @@ return
   parse arg id,sAttrName
   if \self~_canHaveAttributes(id)
   then self~_abort(,
-            'XML022E' g.!NODETYPE.id 'node cannot have attributes:',
+            'XML022E' g.0NODETYPE.id 'node cannot have attributes:',
             'removeAttribute('id','sAttrName')')
-  aid = g.!FIRSTATTR.id
-  do while aid <> '' & g.!NAME.aid <> sAttrName
-    aid = g.!NEXT.aid
+  aid = g.0FIRSTATTR.id
+  do while aid <> '' & g.0NAME.aid <> sAttrName
+    aid = g.0NEXT.aid
   end
-  if aid <> '' & g.!NAME.aid = sAttrName
+  if aid <> '' & g.0NAME.aid = sAttrName
   then do
-    prevaid = g.!PREV.aid
-    nextaid = g.!NEXT.aid
+    prevaid = g.0PREV.aid
+    nextaid = g.0NEXT.aid
     if prevaid = ''  /* if we are deleting the first attribute */
-    then g.!FIRSTATTR.id = nextaid /* make next attr the first */
-    else g.!NEXT.prevaid = nextaid /* link prev attr to next attr */
+    then g.0FIRSTATTR.id = nextaid /* make next attr the first */
+    else g.0NEXT.prevaid = nextaid /* link prev attr to next attr */
     if nextaid = '' /* if we are deleting the last attribute */
-    then g.!LASTATTR.id  = prevaid /* make prev attr the last */
-    else g.!PREV.nextaid = prevaid /* link next attr to prev attr */
+    then g.0LASTATTR.id  = prevaid /* make prev attr the last */
+    else g.0PREV.nextaid = prevaid /* link next attr to prev attr */
     self~_clearNode(aid)
   end
 return
@@ -1871,13 +1871,13 @@ return sProlog
   /* _getNode: procedure expose g. */
   parse arg node
   select
-    when g.!TYPE.node = g.!ELEMENT_NODE then,
+    when g.0TYPE.node = g.0ELEMENT_NODE then,
          sXML = self~_getElementNode(node)
-    when g.!TYPE.node = g.!TEXT_NODE then,
+    when g.0TYPE.node = g.0TEXT_NODE then,
          sXML = self~escapeText(self~removeWhitespace(self~getText(node)))
-    when g.!TYPE.node = g.!ATTRIBUTE_NODE then,
+    when g.0TYPE.node = g.0ATTRIBUTE_NODE then,
          sXML = self~getName(node)'="'self~escapeText(self~getText(node))'"'
-    when g.!TYPE.node = g.!CDATA_SECTION_NODE then,
+    when g.0TYPE.node = g.0CDATA_SECTION_NODE then,
          sXML = '<![CDATA['self~getText(node)']]>'
     otherwise sXML = '' /* TODO: throw an error here? */
   end
@@ -1889,10 +1889,10 @@ return sXML
   parse arg node
   sName = self~getName(node)
   sAttrs = ''
-  attr = g.!FIRSTATTR.node
+  attr = g.0FIRSTATTR.node
   do while attr <> ''
     sAttrs = sAttrs self~_getNode(attr)
-    attr = g.!NEXT.attr
+    attr = g.0NEXT.attr
   end
   if self~hasChildren(node)
   then do
@@ -1917,7 +1917,7 @@ return sXML
   expose g.
   /* escapeText: procedure expose g. */
   parse arg sText
-  n = verify(sText,g.!ESCAPES,'MATCH')
+  n = verify(sText,g.0ESCAPES,'MATCH')
   if n > 0
   then do
     sNewText = ''
@@ -1927,8 +1927,8 @@ return sXML
       if n = 0
       then parse var sText c +1 sText
       else parse var sText sLeft +(n) c +1 sText
-      sNewText = sNewText || sLeft'&'g.!ESCAPE.c';'
-      n = verify(sText,g.!ESCAPES,'MATCH')
+      sNewText = sNewText || sLeft'&'g.0ESCAPE.c';'
+      n = verify(sText,g.0ESCAPES,'MATCH')
     end
     sText = sNewText || sText
   end
@@ -1942,13 +1942,13 @@ return sText
   expose g.
   /* setDocType: procedure expose g. */
   parse arg sDocType
-  g.!DOCTYPE = sDocType
+  g.0DOCTYPE = sDocType
 return
 
 ::method getDocType
   expose g.
   /* getDocType: procedure expose g. */
-return g.!DOCTYPE
+return g.0DOCTYPE
 
 ::method createComment
   expose g.
@@ -1956,8 +1956,8 @@ return g.!DOCTYPE
   parse arg sData
   id = self~_getNextId()
   self~_clearNode(id)
-  g.!TYPE.id = g.!COMMENT_NODE
-  g.!TEXT.id = sData
+  g.0TYPE.id = g.0COMMENT_NODE
+  g.0TEXT.id = sData
 return id
 
 ::method deepClone
@@ -1972,43 +1972,43 @@ return self~cloneNode(node,1)
   parse arg node,bDeep
   clone = self~_getNextId()
   self~_clearNode(clone)
-  g.!TYPE.clone = g.!TYPE.node
-  g.!NAME.clone = g.!NAME.node
-  g.!TEXT.clone = g.!TEXT.node
+  g.0TYPE.clone = g.0TYPE.node
+  g.0NAME.clone = g.0NAME.node
+  g.0TEXT.clone = g.0TEXT.node
   /* clone any attributes...*/
-  aidin = g.!FIRSTATTR.node
+  aidin = g.0FIRSTATTR.node
   do while aidin <> ''
     aid = self~_getNextId()
-    g.!TYPE.aid = g.!TYPE.aidin
-    g.!NAME.aid = g.!NAME.aidin
-    g.!TEXT.aid = g.!TEXT.aidin
-    g.!PARENT.aid = clone
-    g.!NEXT.aid = ''
-    g.!PREV.aid = ''
-    if g.!FIRSTATTR.clone = '' then g.!FIRSTATTR.clone = aid
-    if g.!LASTATTR.clone <> ''
+    g.0TYPE.aid = g.0TYPE.aidin
+    g.0NAME.aid = g.0NAME.aidin
+    g.0TEXT.aid = g.0TEXT.aidin
+    g.0PARENT.aid = clone
+    g.0NEXT.aid = ''
+    g.0PREV.aid = ''
+    if g.0FIRSTATTR.clone = '' then g.0FIRSTATTR.clone = aid
+    if g.0LASTATTR.clone <> ''
     then do
-      lastaid = g.!LASTATTR.clone
-      g.!NEXT.lastaid = aid
-      g.!PREV.aid = lastaid
+      lastaid = g.0LASTATTR.clone
+      g.0NEXT.lastaid = aid
+      g.0PREV.aid = lastaid
     end
-    g.!LASTATTR.clone = aid
-    aidin = g.!NEXT.aidin
+    g.0LASTATTR.clone = aid
+    aidin = g.0NEXT.aidin
   end
   /* clone any children (if deep clone was requested)...*/
   if bDeep = 1
   then do
-    childin = g.!FIRST.node /* first child of node being cloned */
+    childin = g.0FIRST.node /* first child of node being cloned */
     do while childin <> ''
       child = self~cloneNode(childin,bDeep)
-      g.!PARENT.child = clone
-      parentsLastChild = g.!LAST.clone
-      g.!NEXT.parentsLastChild = child
-      g.!PREV.child = parentsLastChild
-      g.!LAST.clone = child
-      if g.!FIRST.clone = ''
-      then g.!FIRST.clone = child
-      childin = g.!NEXT.childin /* next child of node being cloned */
+      g.0PARENT.child = clone
+      parentsLastChild = g.0LAST.clone
+      g.0NEXT.parentsLastChild = child
+      g.0PREV.child = parentsLastChild
+      g.0LAST.clone = child
+      if g.0FIRST.clone = ''
+      then g.0FIRST.clone = child
+      childin = g.0NEXT.childin /* next child of node being cloned */
     end
   end
 return clone
@@ -2059,12 +2059,12 @@ return clone
   /* Open the specified file and parse it */
   /* nParseRC = parseFile(sFileIn) */
 
-  /* parse source g.!ENV . */
-  if g.!ENV = 'TSO'
+  /* parse source g.0ENV . */
+  if g.0ENV = 'TSO'
   then do
     address ISPEXEC
     'CONTROL ERRORS RETURN'
-    g.!LINES = 0
+    g.0LINES = 0
   end
 
   /* call prettyPrinter sFileOut,2 * 2 is the indentation amount */
@@ -2076,32 +2076,32 @@ return
 ::method prettyPrinter
   expose g.
   /* prettyPrinter: procedure expose g. */
-  parse arg sFileOut,g.!TAB,nRoot
-  if g.!TAB = '' then g.!TAB = 2 /* indentation amount */
+  parse arg sFileOut,g.0TAB,nRoot
+  if g.0TAB = '' then g.0TAB = 2 /* indentation amount */
   if nRoot = '' then nRoot = self~getRoot()
-  g.!INDENT = 0
-  g.!FILEOUT = ''
+  g.0INDENT = 0
+  g.0FILEOUT = ''
   if sFileOut <> ''
   then do
-    g.!FILEOUT = self~openFile(sFileOut,'OUTPUT')
-    if g.!rc = 0
+    g.0FILEOUT = self~openFile(sFileOut,'OUTPUT')
+    if g.0rc = 0
     then say 'PRP001I Creating' sFileOut
     else do
       say 'PRP002E Could not create' sFileOut'. Writing to console...'
-      g.!FILEOUT = '' /* null handle means write to console */
+      g.0FILEOUT = '' /* null handle means write to console */
     end
   end
 
   self~_setDefaultEntities
 
   self~emitProlog
-  g.!INDENT = -g.!TAB
+  g.0INDENT = -g.0TAB
   self~showNode(nRoot)
 
-  if g.!FILEOUT <> ''
+  if g.0FILEOUT <> ''
   then do
     say 'PRP002I Created' sFileOut
-    rc = self~closeFile(g.!FILEOUT)
+    rc = self~closeFile(g.0FILEOUT)
   end
 return
 
@@ -2119,7 +2119,7 @@ return
   then sStandalone = 'yes'
   else sStandalone = g.?xml.standalone
 
-  g.!INDENT = 0
+  g.0INDENT = 0
   self~newSay('<?xml version="'sVersion'"',
                 'encoding="'sEncoding'"',
               'standalone="'sStandalone'"?>')
@@ -2134,21 +2134,21 @@ return
   expose g.
   /* showNode: procedure expose g. */
   parse arg node
-  g.!INDENT = g.!INDENT + g.!TAB
+  g.0INDENT = g.0INDENT + g.0TAB
   select
     when self~isTextNode(node)    then self~emitTextNode(   node)
     when self~isCommentNode(node) then self~emitCommentNode(node)
     when self~isCDATA(node)       then self~emitCDATA(      node)
     otherwise                          self~emitElementNode(node)
   end
-  g.!INDENT = g.!INDENT - g.!TAB
+  g.0INDENT = g.0INDENT - g.0TAB
 return
 
 ::method emitTextNode private
   expose g.
   /* emitTextNode: procedure expose g. */
   parse arg node
-  if g.!PRESERVEWS = 1
+  if g.0PRESERVEWS = 1
   then self~newSay(self~escapeText(self~getText(node)))
   else self~newSay(self~escapeText(self~removeWhitespace(self~getText(node))))
 return
@@ -2201,10 +2201,10 @@ return
   expose g.
   /* Say: procedure expose g. */
   parse arg sMessage
-  sLine = copies(' ',g.!INDENT)sMessage
-  if g.!FILEOUT = ''
+  sLine = copies(' ',g.0INDENT)sMessage
+  if g.0FILEOUT = ''
   then say sLine
-  else self~putLine(g.!FILEOUT,sLine)
+  else self~putLine(g.0FILEOUT,sLine)
 return
 /*REXX*****************************************************************
 **                                                                   **
@@ -2257,7 +2257,7 @@ return
   parse arg sFile,sOptions,sAttrs
   hFile = ''
   select
-    when g.!ENV = 'TSO' then do
+    when g.0ENV = 'TSO' then do
       bOutput = wordpos('OUTPUT',sOptions) > 0
       bQuoted = left(sFile,1) = "'"
       if bQuoted then sFile = strip(sFile,,"'")
@@ -2271,13 +2271,13 @@ return
       then do /* Open a member of a PDS */
         'LMOPEN  DATAID(&hFile) OPTION(INPUT)' /* Input initially */
         /* ... can't update ISPF stats when opened for output */
-        g.!MEMBER.hFile = sMember
+        g.0MEMBER.hFile = sMember
         'LMMFIND DATAID(&hFile) MEMBER('sMember') STATS(YES)'
         if bOutput
         then do
           if rc = 0
-          then g.!STATS.hFile = zlvers','zlmod','zlc4date
-          else g.!STATS.hFile = '1,0,0000/00/00'
+          then g.0STATS.hFile = zlvers','zlmod','zlc4date
+          else g.0STATS.hFile = '1,0,0000/00/00'
           'LMCLOSE DATAID(&hFile)'
           'LMOPEN  DATAID(&hFile) OPTION(&sOptions)'
         end
@@ -2290,7 +2290,7 @@ return
           'LMFREE  DATAID(&hFile)'
           address TSO 'ALLOCATE DATASET('sFile') NEW CATALOG',
                       'SPACE(5,15) TRACKS RECFM(V,B)',
-                      'LRECL('g.!OPTION.WRAP.1 + 4')',
+                      'LRECL('g.0OPTION.WRAP.1 + 4')',
                       'BLKSIZE(27990)' sAttrs
           if bOutput
           then do
@@ -2303,8 +2303,8 @@ return
           end
         end
       end
-      g.!OPTIONS.hFile = sOptions
-      g.!rc = rc /* Return code from LMOPEN */
+      g.0OPTIONS.hFile = sOptions
+      g.0rc = rc /* Return code from LMOPEN */
     end
     otherwise do
       if wordpos('OUTPUT',sOptions) > 0
@@ -2312,8 +2312,8 @@ return
       else junk = stream(sFile,'COMMAND','OPEN READ')
       hFile = sFile
       if stream(sFile,'STATUS') = 'READY'
-      then g.!rc = 0
-      else g.!rc = 4
+      then g.0rc = 0
+      else g.0rc = 4
     end
   end
 return hFile
@@ -2327,18 +2327,18 @@ return hFile
   parse arg hFile
   sLine = ''
   select
-    when g.!ENV = 'TSO' then do
+    when g.0ENV = 'TSO' then do
       'LMGET DATAID(&hFile) MODE(INVAR)',
             'DATALOC(sLine) DATALEN(nLine) MAXLEN(32768)'
-      g.!rc = rc
+      g.0rc = rc
       sLine = strip(sLine,'TRAILING')
       if sLine = '' then sLine = ' '
     end
     otherwise do
-      g.!rc = 0
+      g.0rc = 0
       if chars(hFile) > 0
       then sLine = linein(hFile)
-      else g.!rc = 4
+      else g.0rc = 4
     end
   end
 return sLine
@@ -2351,8 +2351,8 @@ return sLine
   /* putLine: procedure expose g. */
   parse arg hFile,sLine
   select
-    when g.!ENV = 'TSO' then do
-      g.!LINES = g.!LINES + 1
+    when g.0ENV = 'TSO' then do
+      g.0LINES = g.0LINES + 1
       'LMPUT DATAID(&hFile) MODE(INVAR)',
             'DATALOC(sLine) DATALEN('length(sLine)')'
     end
@@ -2373,13 +2373,13 @@ return rc
   parse arg hFile
   rc = 0
   select
-    when g.!ENV = 'TSO' then do
-      if g.!MEMBER.hFile <> '', /* if its a PDS */
-      & wordpos('OUTPUT',g.!OPTIONS.hFile) > 0 /* opened for output */
+    when g.0ENV = 'TSO' then do
+      if g.0MEMBER.hFile <> '', /* if its a PDS */
+      & wordpos('OUTPUT',g.0OPTIONS.hFile) > 0 /* opened for output */
       then do
         parse value date('STANDARD') with yyyy +4 mm +2 dd +2
-        parse var g.!STATS.hFile zlvers','zlmod','zlc4date
-        zlcnorc  = min(g.!LINES,65535)   /* Number of lines   */
+        parse var g.0STATS.hFile zlvers','zlmod','zlc4date
+        zlcnorc  = min(g.0LINES,65535)   /* Number of lines   */
         nVer = right(zlvers,2,'0')right(zlmod,2,'0')  /* vvmm */
         nVer = right(nVer+1,4,'0')       /* vvmm + 1          */
         parse var nVer zlvers +2 zlmod +2
@@ -2388,7 +2388,7 @@ return rc
         zlm4date = yyyy'/'mm'/'dd        /* Modification date */
         zlmtime  = time()                /* Modification time */
         zluser   = userid()              /* Modification user */
-        'LMMREP DATAID(&hFile) MEMBER('g.!MEMBER.hFile') STATS(YES)'
+        'LMMREP DATAID(&hFile) MEMBER('g.0MEMBER.hFile') STATS(YES)'
       end
       'LMCLOSE DATAID(&hFile)'
       'LMFREE  DATAID(&hFile)'

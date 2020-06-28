@@ -91,12 +91,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   /* Open the specified file and parse it */
   nParseRC = parseFile(sFileIn)
 
-  parse source g.!ENV .
-  if g.!ENV = 'TSO'
+  parse source g.0ENV .
+  if g.0ENV = 'TSO'
   then do
     address ISPEXEC
     'CONTROL ERRORS RETURN'
-    g.!LINES = 0
+    g.0LINES = 0
   end
 
   call prettyPrinter sFileOut,2 /* 2 is the indentation amount */
@@ -108,32 +108,32 @@ exit nParseRC
  *-------------------------------------------------------------------*/
 
 prettyPrinter: procedure expose g.
-  parse arg sFileOut,g.!TAB,nRoot
-  if g.!TAB = '' then g.!TAB = 2 /* indentation amount */
+  parse arg sFileOut,g.0TAB,nRoot
+  if g.0TAB = '' then g.0TAB = 2 /* indentation amount */
   if nRoot = '' then nRoot = getRoot()
-  g.!INDENT = 0
-  g.!FILEOUT = ''
+  g.0INDENT = 0
+  g.0FILEOUT = ''
   if sFileOut <> ''
   then do
-    g.!FILEOUT = openFile(sFileOut,'OUTPUT')
-    if g.!rc = 0
+    g.0FILEOUT = openFile(sFileOut,'OUTPUT')
+    if g.0rc = 0
     then say 'PRP001I Creating' sFileOut
     else do
       say 'PRP002E Could not create' sFileOut'. Writing to console...'
-      g.!FILEOUT = '' /* null handle means write to console */
+      g.0FILEOUT = '' /* null handle means write to console */
     end
   end
 
   call _setDefaultEntities
 
   call emitProlog
-  g.!INDENT = -g.!TAB
+  g.0INDENT = -g.0TAB
   call showNode nRoot
 
-  if g.!FILEOUT <> ''
+  if g.0FILEOUT <> ''
   then do
     say 'PRP002I Created' sFileOut
-    rc = closeFile(g.!FILEOUT)
+    rc = closeFile(g.0FILEOUT)
   end
 return
 
@@ -149,7 +149,7 @@ emitProlog: procedure expose g.
   then sStandalone = 'yes'
   else sStandalone = g.?xml.standalone
 
-  g.!INDENT = 0
+  g.0INDENT = 0
   call Say '<?xml version="'sVersion'"',
                 'encoding="'sEncoding'"',
               'standalone="'sStandalone'"?>'
@@ -161,24 +161,24 @@ return
 
 showNode: procedure expose g.
   parse arg node
-  g.!INDENT = g.!INDENT + g.!TAB
+  g.0INDENT = g.0INDENT + g.0TAB
   select
     when isTextNode(node)    then call emitTextNode    node
     when isCommentNode(node) then call emitCommentNode node
     when isCDATA(node)       then call emitCDATA       node
     otherwise                     call emitElementNode node
   end
-  g.!INDENT = g.!INDENT - g.!TAB
+  g.0INDENT = g.0INDENT - g.0TAB
 return
 
 setPreserveWhitespace: procedure expose g.
   parse arg bPreserve
-  g.!PRESERVEWS = bPreserve = 1
+  g.0PRESERVEWS = bPreserve = 1
 return
 
 emitTextNode: procedure expose g.
   parse arg node
-  if g.!PRESERVEWS = 1
+  if g.0PRESERVEWS = 1
   then call Say escapeText(getText(node))
   else call Say escapeText(removeWhitespace(getText(node)))
 return
@@ -223,10 +223,10 @@ return
 
 Say: procedure expose g.
   parse arg sMessage
-  sLine = copies(' ',g.!INDENT)sMessage
-  if g.!FILEOUT = ''
+  sLine = copies(' ',g.0INDENT)sMessage
+  if g.0FILEOUT = ''
   then say sLine
-  else call putLine g.!FILEOUT,sLine
+  else call putLine g.0FILEOUT,sLine
 return
 
 /*INCLUDE io.rex */

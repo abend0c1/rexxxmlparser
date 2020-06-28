@@ -210,7 +210,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **                         Added LINE and ID options.       .        **
 **            20070128 AJA Implemented output line wrapping if       **
 **                         line length exceeds the value in          **
-**                         g.!MAX_OUTPUT_LINE_LENGTH and the         **
+**                         g.0MAX_OUTPUT_LINE_LENGTH and the         **
 **                         WRAP option is specified. NOWRAP is       **
 **                         the default for all environments          **
 **                         other than TSO.                           **
@@ -225,7 +225,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **            20070117 HF  Added support for JES3 statements &       **
 **                     AF  Tivoli Workload Scheduler (formerly       **
 **                         OPC) directives.                          **
-**            20070117 AF  Initialize g.!RC                          **
+**            20070117 AF  Initialize g.0RC                          **
 **            20061017 AJA Added support for UNIX environment.       **
 **                         Tested on Ubuntu Linux 6.06 LTS.          **
 **            20061012 AJA Preserved spaces in JCL comments.         **
@@ -282,13 +282,13 @@ jcl2xml:
   sOptions = 'NOBLANKS' toUpper(sOptions)
   call initParser sOptions /* <-- This is in PARSEXML rexx */
 
-  g.!VERSION = sVersion
-  parse source g.!ENV .
-  if g.!ENV = 'TSO'
+  g.0VERSION = sVersion
+  parse source g.0ENV .
+  if g.0ENV = 'TSO'
   then do
     address ISPEXEC
     'CONTROL ERRORS RETURN'
-    g.!LINES = 0
+    g.0LINES = 0
   end
 
   call setFileNames sFileIn,sFileOut
@@ -299,32 +299,32 @@ jcl2xml:
 
   call scanJobControlFile
 
-  if g.!OPTION.GRAPHML
+  if g.0OPTION.GRAPHML
   then do
     call buildGraphML
-    g.!YED_FRIENDLY = 1
-    call prettyPrinter g.!FILEGML
+    g.0YED_FRIENDLY = 1
+    call prettyPrinter g.0FILEGML
   end
 
-  if g.!OPTION.DUMP
+  if g.0OPTION.DUMP
   then call _displayTree
 
-  if g.!OPTION.XML
+  if g.0OPTION.XML
   then do
     call setDocType /* we don't need a doctype declaration */
     call setPreserveWhitespace 1 /* retain spaces in JCL comments */
-    if g.!OPTION.LINE = 0                                /* 20070130 */
-    then call removeAttributes '_line',g.!JCL
-    if g.!OPTION.ID = 0                                  /* 20070130 */
-    then call removeAttributes '_id',g.!JCL
+    if g.0OPTION.LINE = 0                                /* 20070130 */
+    then call removeAttributes '_line',g.0JCL
+    if g.0OPTION.ID = 0                                  /* 20070130 */
+    then call removeAttributes '_id',g.0JCL
     call rearrangeComments
-    g.!YED_FRIENDLY = 0
-    call prettyPrinter g.!FILEXML,,g.!JCL
+    g.0YED_FRIENDLY = 0
+    call prettyPrinter g.0FILEXML,,g.0JCL
   end
 
-  if g.!OPTION.JCL
+  if g.0OPTION.JCL
   then do
-    call prettyJCL g.!FILEJCL,g.!JCL
+    call prettyJCL g.0FILEJCL,g.0JCL
   end
 
   call Epilog
@@ -336,17 +336,17 @@ return
 The names of the XML and GRAPHML output files are automatically
 generated from the input file filename. The generated file names also
 depend on the operating system. Global variables are set as follows:
-g.!FILETXT = name of input text file  (e.g. JobControl.txt)
-g.!FILEGML = name of output GraphML file  (e.g. JobControl.graphml)
-g.!FILEXML = name of output XML file  (e.g. JobControl.xml)
-g.!FILEJCL = name of output JCL file  (e.g. JobControl.jcl)
+g.0FILETXT = name of input text file  (e.g. JobControl.txt)
+g.0FILEGML = name of output GraphML file  (e.g. JobControl.graphml)
+g.0FILEXML = name of output XML file  (e.g. JobControl.xml)
+g.0FILEJCL = name of output JCL file  (e.g. JobControl.jcl)
 */
 setFileNames: procedure expose g.
   parse arg sFileIn,sFileOut
   if sFileOut = '' then sFileOut = sFileIn
-  if g.!ENV = 'TSO'
+  if g.0ENV = 'TSO'
   then do
-    g.!FILETXT = toUpper(sFileIn)
+    g.0FILETXT = toUpper(sFileIn)
     parse var sFileOut sDataset'('sMember')'
     if pos('(',sFileOut) > 0 /* if member name notation used */
     then do /* output to members in the specified PDS */
@@ -354,22 +354,22 @@ setFileNames: procedure expose g.
       sPrefix = strip(left(sMember,7)) /* room for a suffix char */
       sPrefix = toUpper(sPrefix)
       /* squeeze the file extension into the member name...*/
-      g.!FILEGML = sDataset'('strip(left(sPrefix'GML',8))')'
-      g.!FILEXML = sDataset'('strip(left(sPrefix'XML',8))')'
-      g.!FILEJCL = sDataset'('strip(left(sPrefix'JCL',8))')'
+      g.0FILEGML = sDataset'('strip(left(sPrefix'GML',8))')'
+      g.0FILEXML = sDataset'('strip(left(sPrefix'XML',8))')'
+      g.0FILEJCL = sDataset'('strip(left(sPrefix'JCL',8))')'
     end
     else do /* make output files separate datasets */
-      g.!FILEGML = sDataset'.GRAPHML'
-      g.!FILEXML = sDataset'.XML'
-      g.!FILEJCL = sDataset'.JCL'
+      g.0FILEGML = sDataset'.GRAPHML'
+      g.0FILEXML = sDataset'.XML'
+      g.0FILEJCL = sDataset'.JCL'
     end
   end
   else do
     sFileName  = getFilenameWithoutExtension(sFileOut)
-    g.!FILETXT = sFileIn
-    g.!FILEGML = sFileName'.graphml'
-    g.!FILEXML = sFileName'.xml'
-    g.!FILEJCL = sFileName'.jcl'
+    g.0FILETXT = sFileIn
+    g.0FILEGML = sFileName'.graphml'
+    g.0FILEXML = sFileName'.xml'
+    g.0FILEJCL = sFileName'.jcl'
   end
 return
 
@@ -392,25 +392,25 @@ getFilenameWithoutExtension: procedure expose g.
 return sFileName
 
 initStack: procedure expose g.
-  g.!T = 0              /* set top of stack index */
+  g.0T = 0              /* set top of stack index */
 return
 
 pushStack: procedure expose g.
   parse arg item
-  tos = g.!T + 1        /* get new top of stack index */
-  g.!E.tos = item       /* set new top of stack item */
-  g.!T = tos            /* set new top of stack index */
+  tos = g.0T + 1        /* get new top of stack index */
+  g.0E.tos = item       /* set new top of stack item */
+  g.0T = tos            /* set new top of stack index */
 return
 
 popStack: procedure expose g.
-  tos = g.!T            /* get top of stack index for */
-  item = g.!E.tos       /* get item at top of stack */
-  g.!T = max(tos-1,1)
+  tos = g.0T            /* get top of stack index for */
+  item = g.0E.tos       /* get item at top of stack */
+  g.0T = max(tos-1,1)
 return item
 
 peekStack: procedure expose g.
-  tos = g.!T            /* get top of stack index */
-  item = g.!E.tos       /* get item at top of stack */
+  tos = g.0T            /* get top of stack index */
+  item = g.0E.tos       /* get item at top of stack */
 return item
 
 /*
@@ -428,28 +428,28 @@ and starting the continuation between columns 4 and 16:
 */
 scanJobControlFile: procedure expose g.
   call initStack /* stack of conditional jcl blocks */
-  g.!JCL = createDocumentFragment('jcl')
-  call setAttribute g.!JCL,'src',g.!FILETXT
-  call appendAuthor g.!JCL
-  g.!STMTID = 0 /* unique statement id */
-  parent = g.!JCL
+  g.0JCL = createDocumentFragment('jcl')
+  call setAttribute g.0JCL,'src',g.0FILETXT
+  call appendAuthor g.0JCL
+  g.0STMTID = 0 /* unique statement id */
+  parent = g.0JCL
   call pushStack parent
-  g.!FILEIN = openFile(g.!FILETXT)
-  g.!JCLLINE = 0   /* current line number in the JCL */
-  g.!DELIM = '/*'  /* current end-of-data delimiter */
-  g.!JCLDATA.0 = 0    /* current number of lines of inline data */
-  g.!PENDING_STMT = ''
+  g.0FILEIN = openFile(g.0FILETXT)
+  g.0JCLLINE = 0   /* current line number in the JCL */
+  g.0DELIM = '/*'  /* current end-of-data delimiter */
+  g.0JCLDATA.0 = 0    /* current number of lines of inline data */
+  g.0PENDING_STMT = ''
   dd = '' /* DD associated with any inline data */
-  call getStatement /* returns data in g.!JCLxxxx variables */
-  if g.!OPTION.TRACE                                     /* 20070130 */
+  call getStatement /* returns data in g.0JCLxxxx variables */
+  if g.0OPTION.TRACE                                     /* 20070130 */
   then say ' Stmt  Line Type Name     Op       Operands'
-  do nStmt = 1 while g.!RC = 0 & g.!JCLTYPE <> g.!JCLTYPE_EOJ
-    if g.!OPTION.TRACE then call sayTrace nStmt
+  do nStmt = 1 while g.0RC = 0 & g.0JCLTYPE <> g.0JCLTYPE_EOJ
+    if g.0OPTION.TRACE then call sayTrace nStmt
     select
-      when g.!JCLTYPE = g.!JCLTYPE_STATEMENT then do
+      when g.0JCLTYPE = g.0JCLTYPE_STATEMENT then do
         stmt = newStatementNode()
         select
-          when g.!JCLOPER = 'IF' then do
+          when g.0JCLOPER = 'IF' then do
             parent = popUntil('step if then else proc job')
             if getNodeName(parent) = 'step'
             then do
@@ -462,36 +462,36 @@ scanJobControlFile: procedure expose g.
             call appendchild thenNode,stmt
             call pushStack thenNode
           end
-          when g.!JCLOPER = 'ELSE' then do
+          when g.0JCLOPER = 'ELSE' then do
             parent = popUntil('if')
             call appendChild stmt,parent
             call pushStack stmt
           end
-          when g.!JCLOPER = 'ENDIF' then do
+          when g.0JCLOPER = 'ENDIF' then do
             parent = popUntil('if')
-            if g.!JCLNAME <> ''                          /* 20070130 */
-            then call setAttribute parent,'_endname',g.!JCLNAME
-            if g.!JCLCOMM <> ''                          /* 20070130 */
-            then call setAttribute parent,'_endcomm',g.!JCLCOMM
+            if g.0JCLNAME <> ''                          /* 20070130 */
+            then call setAttribute parent,'_endname',g.0JCLNAME
+            if g.0JCLCOMM <> ''                          /* 20070130 */
+            then call setAttribute parent,'_endcomm',g.0JCLCOMM
             parent = popStack() /* discard 'if' */
           end
-          when g.!JCLOPER = 'JOB' then do
+          when g.0JCLOPER = 'JOB' then do
             dd = ''
             parent = popUntil('jcl')
             call appendChild stmt,parent
             call pushStack stmt
           end
-          when g.!JCLOPER = 'JCLLIB' then do
+          when g.0JCLOPER = 'JCLLIB' then do
             parent = popUntil('job')
             call appendChild stmt,parent
-            parse var g.!JCLPARM 'ORDER='sOrder .
+            parse var g.0JCLPARM 'ORDER='sOrder .
             if left(sOrder,1) = '('
             then parse var sOrder '('sOrder')'
             sOrder = translate(sOrder,'',',')
-            g.!ORDER.0 = 0
+            g.0ORDER.0 = 0
             do j = 1 to words(sOrder)
-              g.!ORDER.j = word(sOrder,j)
-              g.!ORDER.0 = j
+              g.0ORDER.j = word(sOrder,j)
+              g.0ORDER.0 = j
             end
             /* TODO: Append system libraries somehow */
             /* The JES2 search order for INCLUDE groups is:
@@ -504,37 +504,37 @@ scanJobControlFile: procedure expose g.
                4. PROC00 DD in JES2 started task JCL.
             */
           end
-          when g.!JCLOPER = 'INCLUDE' then do
+          when g.0JCLOPER = 'INCLUDE' then do
             /* TODO: Replace this with the actual included text */
             parent = popUntil('step proc job')
             call appendChild stmt,parent
           end
-          when g.!JCLOPER = 'PROC' then do
+          when g.0JCLOPER = 'PROC' then do
             parent = peekStack()
             call appendChild stmt,parent
             call pushStack stmt
           end
-          when g.!JCLOPER = 'PEND' then do
+          when g.0JCLOPER = 'PEND' then do
             parent = popUntil('proc')
             parent = popStack() /* discard 'proc' */
           end
-          when g.!JCLOPER = 'CNTL' then do
+          when g.0JCLOPER = 'CNTL' then do
             dd = ''
             parent = popUntil('step proc job')
             call appendChild stmt,parent
             call pushStack stmt
           end
-          when g.!JCLOPER = 'ENDCNTL' then do
+          when g.0JCLOPER = 'ENDCNTL' then do
             parent = popUntil('cntl')
             parent = popStack() /* discard 'cntl' */
           end
-          when g.!JCLOPER = 'EXEC' then do
+          when g.0JCLOPER = 'EXEC' then do
             dd = ''
             parent = popUntil('proc job then else')
             call appendChild stmt,parent
             call pushStack stmt
           end
-          when g.!JCLOPER = 'DD' then do
+          when g.0JCLOPER = 'DD' then do
             dd = stmt  /* used to append instream data later...*/
             if getAttribute(stmt,'_name') = '' /* concatenated dd? */
             then do
@@ -547,7 +547,7 @@ scanJobControlFile: procedure expose g.
               call pushStack stmt
             end
           end
-          when g.!JCLOPER = 'SET' then do
+          when g.0JCLOPER = 'SET' then do
             /* coalesce multiple 'SET' statements into a single one */
             /* TODO: consider coalescing SET stmts after XML is built */
             if sLastOper <> 'SET'
@@ -573,14 +573,14 @@ scanJobControlFile: procedure expose g.
             call appendChild stmt,parent
           end
         end
-        sLastOper = g.!JCLOPER
+        sLastOper = g.0JCLOPER
       end
-      when g.!JCLTYPE = g.!JCLTYPE_DATA then do
+      when g.0JCLTYPE = g.0JCLTYPE_DATA then do
         if dd = '' /* inline data without a preceding dd */
         then do /* auto-generate a SYSIN DD statement */
-          g.!STMTID = g.!STMTID + 1
-          dd = newElement('dd','_id',g.!STMTID,,
-                               '_line',g.!JCLLINE,,
+          g.0STMTID = g.0STMTID + 1
+          dd = newElement('dd','_id',g.0STMTID,,
+                               '_line',g.0JCLLINE,,
                                '_name','SYSIN',,
                                '_','*',,
                                '_comment','GENERATED STATEMENT')
@@ -589,84 +589,84 @@ scanJobControlFile: procedure expose g.
           call pushStack dd
         end
         call appendChild getInlineDataNode(),dd
-        g.!JCLDATA.0 = 0                                 /* 20070124 */
+        g.0JCLDATA.0 = 0                                 /* 20070124 */
       end
-      when g.!JCLTYPE = g.!JCLTYPE_COMMENT then do
-        if nLastStatementType <> g.!JCLTYPE_COMMENT
+      when g.0JCLTYPE = g.0JCLTYPE_COMMENT then do
+        if nLastStatementType <> g.0JCLTYPE_COMMENT
         then do /* group multiple comment lines together */
-          comment = newElement('comment','_line',g.!JCLLINE)
+          comment = newElement('comment','_line',g.0JCLLINE)
           parent = popUntil('step proc job dd if then else') /* 20110907 */
           call appendChild comment,parent
         end
-        call appendChild createTextNode(g.!JCLCOMM),comment
+        call appendChild createTextNode(g.0JCLCOMM),comment
       end
-      when g.!JCLTYPE = g.!JCLTYPE_JES2CMD then do
+      when g.0JCLTYPE = g.0JCLTYPE_JES2CMD then do
         stmt = newStatementNode()
         parent = peekStack()
         call appendChild stmt,parent
       end
-      when g.!JCLTYPE = g.!JCLTYPE_JES2STMT then do
+      when g.0JCLTYPE = g.0JCLTYPE_JES2STMT then do
         stmt = newStatementNode()
         parent = peekStack()
         call appendChild stmt,parent
       end
-      when g.!JCLTYPE = g.!JCLTYPE_JES3STMT then do
+      when g.0JCLTYPE = g.0JCLTYPE_JES3STMT then do
         stmt = newStatementNode()
         parent = peekStack()
         call appendChild stmt,parent
       end
-      when g.!JCLTYPE = g.!JCLTYPE_OPCDIR  then do      /* HF 061218 */
+      when g.0JCLTYPE = g.0JCLTYPE_OPCDIR  then do      /* HF 061218 */
         stmt = newStatementNode()
         parent = peekStack()
         call appendChild stmt,parent
       end                                               /* HF 061218 */
-      when g.!JCLTYPE = g.!JCLTYPE_EOJ then nop
+      when g.0JCLTYPE = g.0JCLTYPE_EOJ then nop
       otherwise do /* should not occur (famous last words) */
-        say 'JCL003E Unknown statement on line' g.!JCLLINE':',
-            '"'g.!JCLOPER g.!JCLPARM'"'
+        say 'JCL003E Unknown statement on line' g.0JCLLINE':',
+            '"'g.0JCLOPER g.0JCLPARM'"'
       end
     end
-    nLastStatementType = g.!JCLTYPE
+    nLastStatementType = g.0JCLTYPE
     call getStatement
   end
-  if g.!JCLDATA.0 > 0 /* dump any pending sysin before eof reached */
+  if g.0JCLDATA.0 > 0 /* dump any pending sysin before eof reached */
   then do
     call appendChild getInlineDataNode(),dd
   end
-  rc = closeFile(g.!FILEIN)
-  say 'JCL004I Processed' g.!K-1 'JCL statements'
+  rc = closeFile(g.0FILEIN)
+  say 'JCL004I Processed' g.0K-1 'JCL statements'
 return
 
 sayTrace: procedure expose g.
   parse arg nStmt
   select
-    when g.!JCLTYPE = g.!JCLTYPE_COMMENT then do
-      call sayTraceLine nStmt,g.!JCLLINE,g.!JCLCOMM
+    when g.0JCLTYPE = g.0JCLTYPE_COMMENT then do
+      call sayTraceLine nStmt,g.0JCLLINE,g.0JCLCOMM
     end
-    when g.!JCLTYPE = g.!JCLTYPE_DATA then do
-      nLine = g.!JCLLINE - g.!JCLDATA.0
-      do i = 1 to g.!JCLDATA.0
-        call sayTraceLine nStmt,nLine,g.!JCLDATA.i
+    when g.0JCLTYPE = g.0JCLTYPE_DATA then do
+      nLine = g.0JCLLINE - g.0JCLDATA.0
+      do i = 1 to g.0JCLDATA.0
+        call sayTraceLine nStmt,nLine,g.0JCLDATA.i
         nLine = nLine + 1
       end
     end
     otherwise do
-      call sayTraceLine nStmt,g.!JCLLINE,,
-           left(g.!JCLNAME,8) left(g.!JCLOPER,8) g.!JCLPARM
+      call sayTraceLine nStmt,g.0JCLLINE,,
+           left(g.0JCLNAME,8) left(g.0JCLOPER,8) g.0JCLPARM
     end
   end
 return
 
 sayTraceLine: procedure expose g.
   parse arg nStmt,nLine,sData
-  nType = g.!JCLTYPE
-  sType = g.!JCLTYPE.nType
+  nType = g.0JCLTYPE
+  sType = g.0JCLTYPE.nType
   say left(right(nStmt,5) right(nLine,5) left(sType,4) sData,79)
 return
 
 appendAuthor: procedure expose g.
   parse arg node
-  comment = createComment('Created by JCL to XML Converter' g.!VERSION)
+  comment = createComment('Created by JCL to XML Converter' g.0VERSION)
   call appendChild comment,node
   comment = createComment('by Andrew J. Armstrong',
                           '(androidarmstrong@gmail.com)')
@@ -691,7 +691,7 @@ intention of the following routine is to move step comments to their
 rightful position - under that step's node. It's not foolproof though.
 */
 rearrangeComments: procedure expose g.
-  steps = getElementsByTagName(g.!JCL,'step')
+  steps = getElementsByTagName(g.0JCL,'step')
   do i = 1 to words(steps)
     step = word(steps,i)
     prev = getPreviousSibling(step)
@@ -741,44 +741,44 @@ return node
 The function of this routine is to return the next statement (by
 accumulating continuations if necessary). The statement is returned in
 a set of global variables as follows:
-g.!JCLLINE   = the line number of the first card of the statement
-g.!JCLTYPE   = the type of statement as follows:
-               g.!JCLTYPE_UNKNOWN    - An unknown statement
-               g.!JCLTYPE_STATEMENT  - A JCL statement
-               g.!JCLTYPE_DATA       - Instream data (see below)
-               g.!JCLTYPE_COMMENT    - A comment card
-               g.!JCLTYPE_EOJ        - An end-of-job card
-               g.!JCLTYPE_JES2CMD    - A JES2 command
-               g.!JCLTYPE_JES2STMT   - A JES2 statement
-               g.!JCLTYPE_JES3STMT   - A JES3 statement
-               g.!JCLTYPE_OPCDIR     - An OPC directive
-g.!JCLNAME   = the statement name field (e.g. a dd name)
-g.!JCLOPER   = the statement operation field (e.g. DD)
-g.!JCLPARM   = the statement parameters (e.g. DISP=SHR etc)
-g.!JCLCOMM   = any comment following the statement, or the entire
+g.0JCLLINE   = the line number of the first card of the statement
+g.0JCLTYPE   = the type of statement as follows:
+               g.0JCLTYPE_UNKNOWN    - An unknown statement
+               g.0JCLTYPE_STATEMENT  - A JCL statement
+               g.0JCLTYPE_DATA       - Instream data (see below)
+               g.0JCLTYPE_COMMENT    - A comment card
+               g.0JCLTYPE_EOJ        - An end-of-job card
+               g.0JCLTYPE_JES2CMD    - A JES2 command
+               g.0JCLTYPE_JES2STMT   - A JES2 statement
+               g.0JCLTYPE_JES3STMT   - A JES3 statement
+               g.0JCLTYPE_OPCDIR     - An OPC directive
+g.0JCLNAME   = the statement name field (e.g. a dd name)
+g.0JCLOPER   = the statement operation field (e.g. DD)
+g.0JCLPARM   = the statement parameters (e.g. DISP=SHR etc)
+g.0JCLCOMM   = any comment following the statement, or the entire
                comment text if this is a comment card
 One or more instream data cards are treated as a single pseudo-statement
-with g.!JCLTYPE set to g.!JCLTYPE_DATA and the cards returned in an
+with g.0JCLTYPE set to g.0JCLTYPE_DATA and the cards returned in an
 array as follows:
-g.!JCLDATA.0 = the number of instream data cards
-g.!JCLDATA.n = instream data card 'n' (n = 1 to g.!JCLDATA.0)
+g.0JCLDATA.0 = the number of instream data cards
+g.0JCLDATA.n = instream data card 'n' (n = 1 to g.0JCLDATA.0)
 */
 getStatement: procedure expose g.
-  g.!JCLTYPE = g.!JCLTYPE_UNKNOWN
-  g.!JCLNAME = ''  /* Statement label     */
-  g.!JCLOPER = ''  /* Statement operation */
-  g.!JCLCOMM = ''  /* Statement comment   */
-  g.!RC      = 0                                        /* AF 061018 */
+  g.0JCLTYPE = g.0JCLTYPE_UNKNOWN
+  g.0JCLNAME = ''  /* Statement label     */
+  g.0JCLOPER = ''  /* Statement operation */
+  g.0JCLCOMM = ''  /* Statement comment   */
+  g.0RC      = 0                                        /* AF 061018 */
   /* The following kludge handles the case where a JCL author
      omits the end-of-data delimiter from inline data (instead the
      next statement terminates the inline data). When this happens we
      have already read the next statement, so we need to remember it
      and process it the next time 'getStatement' is called.
   */
-  if g.!PENDING_STMT <> ''
+  if g.0PENDING_STMT <> ''
   then do
-    sLine = g.!PENDING_STMT
-    g.!PENDING_STMT = ''
+    sLine = g.0PENDING_STMT
+    g.0PENDING_STMT = ''
   end
   else sLine = getNextLine()
   parse var sLine 1 s2 +2 1 s3 +3
@@ -787,15 +787,15 @@ getStatement: procedure expose g.
       if substr(sLine,3,1) = '$'
       then do
         parse var sLine '/*$'sJesCmd','sJesParms
-        g.!JCLTYPE = g.!JCLTYPE_JES2CMD
-        g.!JCLOPER = sJesCmd
-        g.!JCLPARM = sJesParms
+        g.0JCLTYPE = g.0JCLTYPE_JES2CMD
+        g.0JCLOPER = sJesCmd
+        g.0JCLPARM = sJesParms
       end
       else do
         parse var sLine '/*'sJesStmt sJesParms
-        g.!JCLTYPE = g.!JCLTYPE_JES2STMT
-        g.!JCLOPER = sJesStmt
-        g.!JCLPARM = sJesParms
+        g.0JCLTYPE = g.0JCLTYPE_JES2STMT
+        g.0JCLOPER = sJesStmt
+        g.0JCLPARM = sJesParms
       end
     end
     when s3 = '//*' then do                             /* HF 061218 */
@@ -806,48 +806,48 @@ getStatement: procedure expose g.
       select
         when sWord = '%OPC' then do       /* OPC directive           */
           parse var sLine '//*%OPC' sOpcStmt sOpcParms
-          g.!JCLTYPE = g.!JCLTYPE_OPCDIR
-          g.!JCLOPER = sOpcStmt
-          g.!JCLPARM = sOpcParms
+          g.0JCLTYPE = g.0JCLTYPE_OPCDIR
+          g.0JCLOPER = sOpcStmt
+          g.0JCLPARM = sOpcParms
         end
         when isJes3Statement(sWord) then do /* JES3 statement        */
           parse var sLine '//*'sJesStmt sJesParms
-          g.!JCLTYPE = g.!JCLTYPE_JES3STMT
-          g.!JCLOPER = sJesStmt
-          g.!JCLPARM = sJesParms
+          g.0JCLTYPE = g.0JCLTYPE_JES3STMT
+          g.0JCLOPER = sJesStmt
+          g.0JCLPARM = sJesParms
         end
         otherwise do                      /* Comment                 */
-          g.!JCLTYPE = g.!JCLTYPE_COMMENT
-          g.!JCLCOMM = substr(sLine,4)
+          g.0JCLTYPE = g.0JCLTYPE_COMMENT
+          g.0JCLCOMM = substr(sLine,4)
         end
       end
     end                                                 /* HF 061218 */
     when sLine = '//' then do
-      g.!JCLTYPE = g.!JCLTYPE_EOJ
+      g.0JCLTYPE = g.0JCLTYPE_EOJ
     end
     when s2 = '//' then do
       sName = ''
       if substr(sLine,3,1) = ' '
       then parse var sLine '//'      sOper sParms
       else parse var sLine '//'sName sOper sParms
-      g.!JCLTYPE = g.!JCLTYPE_STATEMENT
-      g.!JCLNAME = sName
-      g.!JCLOPER = sOper
+      g.0JCLTYPE = g.0JCLTYPE_STATEMENT
+      g.0JCLNAME = sName
+      g.0JCLOPER = sOper
       select                                             /* 20070130 */
         when sOper = 'IF' then do
           /* IF has its own continuation rules */
-          do while g.!RC = 0 & pos('THEN',sParms) = 0
+          do while g.0RC = 0 & pos('THEN',sParms) = 0
              sLine = getNextLine()
              parse var sLine '//' sThenContinued
              sParms = sParms strip(sThenContinued)
           end
           parse var sParms sParms 'THEN' sComment
-          g.!JCLPARM = strip(sParms)
-          g.!JCLCOMM = sComment                          /* 20070128 */
+          g.0JCLPARM = strip(sParms)
+          g.0JCLCOMM = sComment                          /* 20070128 */
         end
         when sOper = 'ELSE' | sOper = 'ENDIF' then do    /* 20070130 */
-          g.!JCLPARM = ''
-          g.!JCLCOMM = strip(sParms)
+          g.0JCLPARM = ''
+          g.0JCLCOMM = strip(sParms)
         end
         otherwise do /* Slurp up any continuation cards */
           /* This gets really ugly...
@@ -868,57 +868,57 @@ getStatement: procedure expose g.
              //.A comment (star is shown as a dot to keep Rexx happy)
              //           PARM='HI THERE'
           */
-          g.!INSTRING = 0 /* for detecting continued quoted strings */
+          g.0INSTRING = 0 /* for detecting continued quoted strings */
           sParms = getNormalized(sParms)
           parse var sParms sParms sComment
-          g.!JCLPARM = sParms
-          do while g.!RC = 0 & pos(right(sParms,1),'ff'x',') > 0
+          g.0JCLPARM = sParms
+          do while g.0RC = 0 & pos(right(sParms,1),'ff'x',') > 0
             sLine = getNextLine()
-            do while g.!RC = 0 & left(sLine,3) = '//*'
+            do while g.0RC = 0 & left(sLine,3) = '//*'
               sLine = getNextLine()
             end
-            if g.!RC = 0
+            if g.0RC = 0
             then do
               parse var sLine '//'       sParms
               sParms = getNormalized(sParms)
               parse var sParms sParms sComment
-              g.!JCLPARM = g.!JCLPARM || sParms
+              g.0JCLPARM = g.0JCLPARM || sParms
             end
           end
-          if sOper = 'DD' & pos('DLM=',g.!JCLPARM) > 0
-          then parse var g.!JCLPARM 'DLM=' +4 g.!DELIM +2
-          g.!JCLCOMM = sComment                          /* 20070128 */
+          if sOper = 'DD' & pos('DLM=',g.0JCLPARM) > 0
+          then parse var g.0JCLPARM 'DLM=' +4 g.0DELIM +2
+          g.0JCLCOMM = sComment                          /* 20070128 */
         end
       end
     end
     otherwise do
-      g.!JCLTYPE = g.!JCLTYPE_DATA
-      g.!JCLPARM = ''
+      g.0JCLTYPE = g.0JCLTYPE_DATA
+      g.0JCLPARM = ''
       n = 0
-      do while g.!RC = 0 & \isEndOfData(s2)
+      do while g.0RC = 0 & \isEndOfData(s2)
         n = n + 1
-        g.!JCLDATA.n = strip(sLine,'TRAILING')
+        g.0JCLDATA.n = strip(sLine,'TRAILING')
         sLine = getNextLine()
         parse var sLine 1 s2 +2
       end
-      if g.!DELIM = '/*' & s2 = '//' /* end-of-data marker omitted */
-      then g.!PENDING_STMT = sLine
-      g.!JCLDATA.0 = n
-      g.!DELIM = '/*'  /* reset EOD delimiter to the default */
+      if g.0DELIM = '/*' & s2 = '//' /* end-of-data marker omitted */
+      then g.0PENDING_STMT = sLine
+      g.0JCLDATA.0 = n
+      g.0DELIM = '/*'  /* reset EOD delimiter to the default */
     end
   end
-  g.!K = g.!K + 1
-  g.!KDELTA = g.!KDELTA + 1
-  if g.!KDELTA >= 100
+  g.0K = g.0K + 1
+  g.0KDELTA = g.0KDELTA + 1
+  if g.0KDELTA >= 100
   then do
-    say 'JCL005I Processed' g.!K 'statements'
-    g.!KDELTA = 0
+    say 'JCL005I Processed' g.0K 'statements'
+    g.0KDELTA = 0
   end
 return
 
 isJes3Statement: procedure expose g.
   arg sStmt
-  if \g.!OPTION.JES3 then return 0 
+  if \g.0OPTION.JES3 then return 0 
   sJes3Stmts = 'DATASET ENDDATASET ENDPROCESS FORMAT MAIN NET NETACCT',
                'OPERATOR *PAUSE PROCESS ROUTE'
 return wordpos(sStmt,sJes3Stmts) > 0
@@ -934,19 +934,19 @@ getNormalized: procedure expose g.
   parse arg sLine
   sLine = strip(sLine,'LEADING')
   sNormalized = ''
-  do i = 1 to length(sLine) until c = ' ' & \g.!INSTRING
+  do i = 1 to length(sLine) until c = ' ' & \g.0INSTRING
     c = substr(sLine,i,1)
     select
-      when c = "'" & g.!INSTRING then g.!INSTRING = 0
-      when c = "'" then g.!INSTRING = 1
-      when c = ' ' & g.!INSTRING then c = 'ff'x
+      when c = "'" & g.0INSTRING then g.0INSTRING = 0
+      when c = "'" then g.0INSTRING = 1
+      when c = ' ' & g.0INSTRING then c = 'ff'x
       otherwise nop
     end
     sNormalized = sNormalized || c
   end
   if i <= length(sLine)
   then do
-    if g.!INSTRING /* make trailing blanks 'hard' blanks */
+    if g.0INSTRING /* make trailing blanks 'hard' blanks */
     then sNormalized = sNormalized ||,
                        translate(substr(sLine,i),'ff'x,' ')
     else sNormalized = sNormalized || substr(sLine,i)
@@ -955,21 +955,21 @@ return strip(sNormalized)
 
 isEndOfData: procedure expose g.
   parse arg s2
-  bEOD =  g.!DELIM = s2,
-       | (g.!DELIM = '/*' & s2 = '//')
+  bEOD =  g.0DELIM = s2,
+       | (g.0DELIM = '/*' & s2 = '//')
 return bEOD
 
 getInlineDataNode: procedure expose g.
   sLines = ''
-  do n = 1 to g.!JCLDATA.0
-    sLines = sLines || g.!JCLDATA.n || g.!LF
+  do n = 1 to g.0JCLDATA.0
+    sLines = sLines || g.0JCLDATA.n || g.0LF
   end
 return createCDATASection(sLines)
 
 newPseudoStatementNode: procedure expose g.
   parse arg sName
-  g.!STMTID = g.!STMTID + 1
-  stmt = newElement(sName,'_id',g.!STMTID)
+  g.0STMTID = g.0STMTID + 1
+  stmt = newElement(sName,'_id',g.0STMTID)
 return stmt
 
 /*
@@ -986,100 +986,100 @@ newElement: procedure expose g.
 return id
 
 newStatementNode: procedure expose g.
-  g.!STMTID = g.!STMTID + 1
+  g.0STMTID = g.0STMTID + 1
   select
-    when g.!JCLTYPE = g.!JCLTYPE_JES2CMD then do
+    when g.0JCLTYPE = g.0JCLTYPE_JES2CMD then do
       stmt = newElement('jes2cmd',,
-                        '_id',g.!STMTID,,
-                        '_line',g.!JCLLINE,,
-                        'cmd',g.!JCLOPER,,
-                        'parm',strip(g.!JCLPARM))
+                        '_id',g.0STMTID,,
+                        '_line',g.0JCLLINE,,
+                        'cmd',g.0JCLOPER,,
+                        'parm',strip(g.0JCLPARM))
       return stmt
     end
-    when g.!JCLTYPE = g.!JCLTYPE_JES2STMT then do
+    when g.0JCLTYPE = g.0JCLTYPE_JES2STMT then do
       stmt = newElement('jes2stmt',,
-                       '_id',g.!STMTID,,
-                        '_line',g.!JCLLINE,,
-                       'stmt',g.!JCLOPER)
-      call getParmMap g.!JCLPARM
+                       '_id',g.0STMTID,,
+                        '_line',g.0JCLLINE,,
+                       'stmt',g.0JCLOPER)
+      call getParmMap g.0JCLPARM
       call setParms stmt
       return stmt
     end
-    when g.!JCLTYPE = g.!JCLTYPE_JES3STMT then do
+    when g.0JCLTYPE = g.0JCLTYPE_JES3STMT then do
       stmt = newElement('jes3stmt',,
-                       '_id',g.!STMTID,,
-                        '_line',g.!JCLLINE,,
-                       'stmt',g.!JCLOPER)
-      call getParmMap g.!JCLPARM
+                       '_id',g.0STMTID,,
+                        '_line',g.0JCLLINE,,
+                       'stmt',g.0JCLOPER)
+      call getParmMap g.0JCLPARM
       call setParms stmt
       return stmt
     end
-    when g.!JCLTYPE = g.!JCLTYPE_OPCDIR  then do        /* HF 061218 */
+    when g.0JCLTYPE = g.0JCLTYPE_OPCDIR  then do        /* HF 061218 */
       stmt = newElement('opcdir',,
-                       '_id',g.!STMTID,,
-                        '_line',g.!JCLLINE,,             /* 20070214 */
-                        'cmd',g.!JCLOPER,,
-                        'parm',strip(g.!JCLPARM))
+                       '_id',g.0STMTID,,
+                        '_line',g.0JCLLINE,,             /* 20070214 */
+                        'cmd',g.0JCLOPER,,
+                        'parm',strip(g.0JCLPARM))
       return stmt
     end                                                 /* HF 061218 */
     otherwise nop
   end
-  if g.!JCLOPER = 'EXEC'
+  if g.0JCLOPER = 'EXEC'
   then stmt = newElement('step')
-  else stmt = newElement(toLower(g.!JCLOPER))
-  call setAttributes stmt,'_id',g.!STMTID,,
-                        '_line',g.!JCLLINE
-  if g.!JCLNAME <> ''
-  then call setAttribute stmt,'_name',g.!JCLNAME
-  if g.!JCLCOMM <> ''                                    /* 20070128 */
-  then call setAttribute stmt,'_comment',strip(g.!JCLCOMM)
+  else stmt = newElement(toLower(g.0JCLOPER))
+  call setAttributes stmt,'_id',g.0STMTID,,
+                        '_line',g.0JCLLINE
+  if g.0JCLNAME <> ''
+  then call setAttribute stmt,'_name',g.0JCLNAME
+  if g.0JCLCOMM <> ''                                    /* 20070128 */
+  then call setAttribute stmt,'_comment',strip(g.0JCLCOMM)
 
-  call getParmMap g.!JCLPARM
+  call getParmMap g.0JCLPARM
   sNodeName = getNodeName(stmt)
   select
     when sNodeName = 'if' then do
-      call setAttributes stmt,'cond',space(g.!JCLPARM)
+      call setAttributes stmt,'cond',space(g.0JCLPARM)
     end
     when sNodeName = 'set' then do
       /* //name  SET   var=value[,var=value]... comment */
-      do i = 1 to g.!PARM.0
-        sKey = translate(g.!PARM.i)
+      do i = 1 to g.0PARM.0
+        sKey = translate(g.0PARM.i)
         var = newElement('var','name',sKey,,
-                               'value',getParm(g.!PARM.i),,
-                               '_line',g.!JCLLINE)
+                               'value',getParm(g.0PARM.i),,
+                               '_line',g.0JCLLINE)
         call appendChild var,stmt
       end
       /* apply any comment to the last variable */
-      if g.!JCLCOMM <> ''
-      then call setAttribute var,'_comment',strip(g.!JCLCOMM)
+      if g.0JCLCOMM <> ''
+      then call setAttribute var,'_comment',strip(g.0JCLCOMM)
     end
     when sNodeName = 'step' then do
       bPgm     = 0
       bProc    = 0
-      do i = 1 to g.!PARM.0
-        bPgm  = bPgm  | g.!PARM.i = 'pgm'
-        bProc = bProc | g.!PARM.i = 'proc'
+      do i = 1 to g.0PARM.0
+        bPgm  = bPgm  | g.0PARM.i = 'pgm'
+        bProc = bProc | g.0PARM.i = 'proc'
       end
       if \bPgm & \bProc
       then do
         sKey = '_' /* the name for positional parameters */
-        sPositionals = g.!PARM.sKey
+        sPositionals = g.0PARM.sKey
         sKey = 'proc'
-        g.!PARM.1 = sKey
-        g.!PARM.sKey = sPositionals
+        g.0PARM.1 = sKey
+        g.0PARM.sKey = sPositionals
       end
-      do i = 1 to g.!PARM.0
-        sKey   = g.!PARM.i
+      do i = 1 to g.0PARM.0
+        sKey   = g.0PARM.i
         call setAttribute stmt,getSafeAttrName(sKey),getParm(sKey)
       end
     end
     when sNodeName = 'job' then do
-      do i = 1 to g.!PARM.0
-        sKey   = g.!PARM.i
+      do i = 1 to g.0PARM.0
+        sKey   = g.0PARM.i
         if sKey = '_'
         then do /* [(acct,info)][,programmer] */
                 /* [acct][,programmer] */
-          sPositionals = g.!PARM.sKey
+          sPositionals = g.0PARM.sKey
           if left(sPositionals,1) = '('
           then parse var sPositionals '('sAcctAndInfo'),'sProg
           else parse var sPositionals sAcctAndInfo','sProg
@@ -1103,15 +1103,15 @@ return translate(sAttrName,'ANS','@#$')
 
 setParms: procedure expose g.
   parse arg stmt
-  do i = 1 to g.!PARM.0
-    sKey = g.!PARM.i
+  do i = 1 to g.0PARM.0
+    sKey = g.0PARM.i
     call setAttribute stmt,sKey,getParm(sKey)
   end
 return
 
 getParm: procedure expose g.
   parse arg sKey
-return deNormalize(g.!PARM.sKey)
+return deNormalize(g.0PARM.sKey)
 
 deNormalize: procedure expose g.
   parse arg sValue
@@ -1124,17 +1124,17 @@ return translate(sValue,' ','ff'x)
     A,(B,C),'D E,F',G=H,I=(J,K),L='M,N O'
     <--positional--><------keywords----->
   This routine parses parameters into stem variables as follows:
-  g.!PARM.0 = number of parameters
-  g.!PARM.n = key for parameter n
-  g.!PARM.key = value for parameter called 'key'
+  g.0PARM.0 = number of parameters
+  g.0PARM.n = key for parameter n
+  g.0PARM.key = value for parameter called 'key'
   ...where n = 1 to the number of parameters.
   A special parameter key called '_' is used for positionals.
   Using the above example:
-  g.!PARM.0 = 4
-  g.!PARM.1 = '_'; g.!PARM._ = "A,(B,C),'D E,F'"
-  g.!PARM.2 = 'G'; g.!PARM.G = 'H'
-  g.!PARM.3 = 'I'; g.!PARM.I = '(J,K)'
-  g.!PARM.4 = 'L'; g.!PARM.L = "'M,N O'"
+  g.0PARM.0 = 4
+  g.0PARM.1 = '_'; g.0PARM._ = "A,(B,C),'D E,F'"
+  g.0PARM.2 = 'G'; g.0PARM.G = 'H'
+  g.0PARM.3 = 'I'; g.0PARM.I = '(J,K)'
+  g.0PARM.4 = 'L'; g.0PARM.L = "'M,N O'"
 */
 getParmMap: procedure expose g.
   parse arg sParms
@@ -1147,8 +1147,8 @@ getParmMap: procedure expose g.
     when nComma = 0 & nEquals = 0 & sParms <> '' then do
       nParm = nParm + 1
       sKey = '_'
-      g.!PARM.nParm = sKey
-      g.!PARM.sKey = sParms
+      g.0PARM.nParm = sKey
+      g.0PARM.sKey = sParms
       sParms = ''
     end
     when nComma > 0 & nComma < nEquals then do
@@ -1156,8 +1156,8 @@ getParmMap: procedure expose g.
       sPositionals = left(sParms,nPos-1)
       nParm = nParm + 1
       sKey = '_'
-      g.!PARM.nParm = sKey
-      g.!PARM.sKey = sPositionals
+      g.0PARM.nParm = sKey
+      g.0PARM.sKey = sPositionals
       sParms = substr(sParms,nPos+1)
     end
     otherwise nop
@@ -1224,10 +1224,10 @@ getParmMap: procedure expose g.
       end
     end
     nParm = nParm + 1
-    g.!PARM.nParm = sKey
-    g.!PARM.sKey = sValue
+    g.0PARM.nParm = sKey
+    g.0PARM.sKey = sValue
   end
-  g.!PARM.0 = nParm
+  g.0PARM.0 = nParm
 return
 
 /* (abc) --> 5 */
@@ -1260,15 +1260,15 @@ return i
 
 toLower: procedure expose g.
   parse arg sText
-return translate(sText,g.!LOWER,g.!UPPER)
+return translate(sText,g.0LOWER,g.0UPPER)
 
 toUpper: procedure expose g.
   parse upper arg sText
 return sText
 
 getNextLine: procedure expose g.
-  sLine = left(getLine(g.!FILEIN),71)
-  g.!JCLLINE = g.!JCLLINE + 1
+  sLine = left(getLine(g.0FILEIN),71)
+  g.0JCLLINE = g.0JCLLINE + 1
 return sLine
 
 
@@ -1302,13 +1302,13 @@ buildGraphML: procedure expose g.
                    'yfiles.type','edgegraphics')
   call appendChild gKey,gDoc
 
-  g.!GRAPH = newElement('graph',,
+  g.0GRAPH = newElement('graph',,
                      'id','G',,
                       'edgedefault','directed')
 
-  call appendChild g.!GRAPH,gDoc
+  call appendChild g.0GRAPH,gDoc
 
-  call drawBlock g.!JCL
+  call drawBlock g.0JCL
 
   call removeEndIfNodes
 return
@@ -1412,8 +1412,8 @@ return gFirstNode','gLastNode
 */
 removeEndIfNodes: procedure expose g.
   gDeadNodes = ''
-  gNodes = getElementsByTagName(g.!GRAPH,'node')
-  gEdges = getElementsByTagName(g.!GRAPH,'edge')
+  gNodes = getElementsByTagName(g.0GRAPH,'node')
+  gEdges = getElementsByTagName(g.0GRAPH,'edge')
   do i = 1 to words(gNodes)
     gEndIf = word(gNodes,i)
     if \hasChildren(gEndIf)
@@ -1445,23 +1445,23 @@ removeEndIfNodes: procedure expose g.
 return
 
 newEndIfNode: procedure expose g.
-  g.!STMTID = g.!STMTID + 1
-  gEndIf = newElement('node','id','n'g.!STMTID)
-  call appendChild gEndIf,g.!GRAPH
+  g.0STMTID = g.0STMTID + 1
+  gEndIf = newElement('node','id','n'g.0STMTID)
+  call appendChild gEndIf,g.0GRAPH
 return gEndIf
 
 newControlFlowLine: procedure expose g.
   gLineStyle = newElement('y:LineStyle',,
                           'type','line',,
                           'width',3,,
-                          'color',g.!COLOR_CONTROL_FLOW)
+                          'color',g.0COLOR_CONTROL_FLOW)
 return gLineStyle
 
 newJobNode: procedure expose g.
   parse arg job
-  sLabel = 'JOB' || g.!LF || getAttribute(job,'_name')
+  sLabel = 'JOB' || g.0LF || getAttribute(job,'_name')
   gGeometry = newElement('y:Geometry','width',70,'height',70)
-  gFill = newElement('y:Fill','color',g.!COLOR_JOB_NODE)
+  gFill = newElement('y:Fill','color',g.0COLOR_JOB_NODE)
   gNodeLabel = newElement('y:NodeLabel')
   call appendChild createCDataSection(sLabel),gNodeLabel
   gJob = newShapeNode(job,,'octagon',gFill,gGeometry,gNodeLabel)
@@ -1473,7 +1473,7 @@ newJobNode: procedure expose g.
     if sDDName <> ''
     then do
       gDD = newFileNode(dd)
-      g.!DSN.sDSN = gDD
+      g.0DSN.sDSN = gDD
       sDDName = getAttribute(dd,'_name')
       call newArrow gDD,gJob,sDDName
     end
@@ -1488,10 +1488,10 @@ return gJob
 
 newEndOfJobNode: procedure expose g.
   gGeometry = newElement('y:Geometry','width',70,'height',70)
-  gFill = newElement('y:Fill','color',g.!COLOR_EOJ_NODE)
+  gFill = newElement('y:Fill','color',g.0COLOR_EOJ_NODE)
   gNodeLabel = newElement('y:NodeLabel',,
                           'fontSize',14,,
-                          'textColor',g.!COLOR_WHITE)
+                          'textColor',g.0COLOR_WHITE)
   call appendChild createTextNode('EOJ'),gNodeLabel
   eoj = newPseudoStatementNode('eoj')
   gEndOfJob = newShapeNode(eoj,,'octagon',gFill,gGeometry,gNodeLabel)
@@ -1499,9 +1499,9 @@ return gEndOfJob
 
 newProcNode: procedure expose g.
   parse arg proc
-  sLabel = 'PROC' || g.!LF || getAttribute(proc,'_name')
+  sLabel = 'PROC' || g.0LF || getAttribute(proc,'_name')
   gGeometry = newElement('y:Geometry','width',100,'height',34)
-  gFill = newElement('y:Fill','color',g.!COLOR_PROC_NODE)
+  gFill = newElement('y:Fill','color',g.0COLOR_PROC_NODE)
   gNodeLabel = newElement('y:NodeLabel')
   call appendChild createCDataSection(sLabel),gNodeLabel
   gProc = newShapeNode(proc,,'roundrectangle',,
@@ -1515,26 +1515,26 @@ newParmsNode: procedure expose g.
   parse arg step,sIgnoredParms
   call getAttributeMap step
   sLabel = ''
-  do i = 1 to g.!ATTRIBUTE.0
-    sKey = g.!ATTRIBUTE.i
+  do i = 1 to g.0ATTRIBUTE.0
+    sKey = g.0ATTRIBUTE.i
     if wordpos(sKey,'_id _name _line _comment' sIgnoredParms) = 0
     then do
-      sVal = g.!ATTRIBUTE.sKey
-      sLabel = sLabel || g.!LF || toUpper(sKey)'='sVal
+      sVal = g.0ATTRIBUTE.sKey
+      sLabel = sLabel || g.0LF || toUpper(sKey)'='sVal
     end
   end
   if sLabel = '' then return '' /* no parms worth mentioning */
-  sLabel = strip(sLabel,'LEADING',g.!LF)
+  sLabel = strip(sLabel,'LEADING',g.0LF)
   parms = newPseudoStatementNode('parms')
   gBorderStyle = newElement('y:BorderStyle','type','dashed')
-  gFill = newElement('y:Fill','color',g.!COLOR_PARMS_NODE)
+  gFill = newElement('y:Fill','color',g.0COLOR_PARMS_NODE)
   gNode = newShapeNode(parms,sLabel,'roundrectangle',,
                       gBorderStyle,gFill)
 return gNode
 
 newEndOfProcNode: procedure expose g.
   gGeometry = newElement('y:Geometry','width',100,'height',34)
-  gFill = newElement('y:Fill','color',g.!COLOR_PEND_NODE)
+  gFill = newElement('y:Fill','color',g.0COLOR_PEND_NODE)
   gNodeLabel = newElement('y:NodeLabel')
   call appendChild createTextNode('PEND'),gNodeLabel
   pend = newPseudoStatementNode('pend')
@@ -1547,7 +1547,7 @@ newDecisionNode: procedure expose g.
   sLabel = getAttribute(id,'cond')
   gNodeLabel = newElement('y:NodeLabel')
   call appendChild createTextNode(sLabel),gNodeLabel
-  gFill = newElement('y:Fill','color',g.!COLOR_IF_NODE)
+  gFill = newElement('y:Fill','color',g.0COLOR_IF_NODE)
   gGeometry = newElement('y:Geometry','width',130,'height',80)
   gDecision = newShapeNode(id,slabel,'diamond',,
                           gFill,gGeometry,gNodeLabel)
@@ -1561,7 +1561,7 @@ newStepNode: procedure expose g.
   if sPgm <> ''
   then sLabel = sStepName 'PGM='sPgm
   else sLabel = sStepName 'PROC='getAttribute(step,'proc')
-  gFill = newElement('y:Fill','color',g.!COLOR_STEP_NODE)
+  gFill = newElement('y:Fill','color',g.0COLOR_STEP_NODE)
   gGeometry = newTextGeometry(22,2)
   gNodeLabel = newElement('y:NodeLabel')
   call appendChild createTextNode(sLabel),gNodeLabel
@@ -1587,7 +1587,7 @@ newStepNode: procedure expose g.
     then do
       select
         when isPrintFile(dd) then do
-          if g.!OPTION.SYSOUT
+          if g.0OPTION.SYSOUT
           then do
             gDD = newPrinterNode(dd)
             call newArrow gStep,gDD,sDDName
@@ -1598,14 +1598,14 @@ newStepNode: procedure expose g.
           call newArrow gStep,gDD,sDDName
         end
         when isInlineFile(dd) then do
-          if g.!OPTION.INLINE
+          if g.0OPTION.INLINE
           then do
             gDD = newInlineNode(dd)
             call newArrow gDD,gStep,sDDName
           end
         end
         when isDummyFile(dd) then do
-          if g.!OPTION.DUMMY
+          if g.0OPTION.DUMMY
           then do
             gDD = newDummyNode(dd)
             call newLine gDD,gStep,sDDName
@@ -1659,7 +1659,7 @@ newShapeNode: procedure expose g.
                        'alignment','left',,
                        'modelPosition','l',,
                        'fontFamily','Monospaced')
-    if pos(g.!LF,sLabel) > 0
+    if pos(g.0LF,sLabel) > 0
     then gText = createCDataSection(sLabel)
     else gText = createTextNode(sLabel)
     call appendChild gText,gNodeLabel
@@ -1669,27 +1669,27 @@ newShapeNode: procedure expose g.
   then do
     gDropShadow = newElement('y:DropShadow',,
                              'offsetX',4,'offsetY',4,,
-                             'color',g.!COLOR_DROP_SHADOW)
+                             'color',g.0COLOR_DROP_SHADOW)
     call appendChild gDropShadow,gShapeNode
   end
   if wordpos('y:Fill',sPropertiesAlreadySet) = 0
   then do
-    gFill = newElement('y:Fill','color',g.!COLOR_SHAPE_NODE)
+    gFill = newElement('y:Fill','color',g.0COLOR_SHAPE_NODE)
     call appendChild gFill,gShapeNode
   end
-  call appendChild gNode,g.!GRAPH
+  call appendChild gNode,g.0GRAPH
 return gNode
 
 getFileNode: procedure expose g.
   parse arg dd
   sDSN = getAttribute(dd,'dsn')
-  if g.!DSN.sDSN = '' /* if file is not already in graph */
+  if g.0DSN.sDSN = '' /* if file is not already in graph */
   then do /* create a new file node and add it to the graph */
     gDD = newFileNode(dd)
-    g.!DSN.sDSN = gDD
+    g.0DSN.sDSN = gDD
   end
   else do /* use existing file node in graph */
-    gDD = g.!DSN.sDSN
+    gDD = g.0DSN.sDSN
   end
 return gDD
 
@@ -1757,8 +1757,8 @@ newFileNode: procedure expose g.
       concatdd = word(dds,i)
       sDataset = getAttribute(concatdd,'dsn')
       if sDataset = '' 
-      then sLabel = sLabel || g.!LF || getCDataLines(concatdd, '+'i)
-      else sLabel = sLabel || g.!LF || '+'i sDataset
+      then sLabel = sLabel || g.0LF || getCDataLines(concatdd, '+'i)
+      else sLabel = sLabel || g.0LF || '+'i sDataset
     end
   end
   else sLabel = getAttribute(dd,'dsn')
@@ -1792,7 +1792,7 @@ newInlineNode: procedure expose g.
   sLabel = getCDataLines(dd, '')
   parse value getLabelDimension(sLabel) with nChars','nLines
   gGeometry = newTextGeometry(nChars,nLines)
-  gFill = newElement('y:Fill','color',g.!COLOR_INLINE_NODE)
+  gFill = newElement('y:Fill','color',g.0COLOR_INLINE_NODE)
   gNode = newShapeNode(dd,sLabel,,gGeometry,gFill)
 return gNode
 
@@ -1805,19 +1805,19 @@ getCDataLines: procedure expose g.
   line = getFirstChild(dd)
   do while line <> '' & isCDATA(line) 
     sData = getText(line)
-    if pos(g.!LF,sData) > 0
+    if pos(g.0LF,sData) > 0
     then do until sData = ''
-      parse var sData sLine (g.!LF) sData
-      sLines = sLines || sPrefix || sLine || g.!LF
+      parse var sData sLine (g.0LF) sData
+      sLines = sLines || sPrefix || sLine || g.0LF
       if bPrefix 
       then sPrefix = sPad '| '
       else sPrefix = ''
     end
-    else sLines = sLines || sPrefix || sData || g.!LF 
+    else sLines = sLines || sPrefix || sData || g.0LF 
     sPrefix = sPad
     line = getNextSibling(line)
   end
-  sLines = strip(sLines,'BOTH',g.!LF)
+  sLines = strip(sLines,'BOTH',g.0LF)
 return sLines
 
 newDummyNode: procedure expose g.
@@ -1831,9 +1831,9 @@ newJCLLibNode: procedure expose g.
   sOrder = getAttribute(jcllib,'order')
   if left(sOrder,1) = '('
   then parse var sOrder '('sOrder')'
-  sLabel = translate(sOrder,g.!LF,',')
+  sLabel = translate(sOrder,g.0LF,',')
   gBorderStyle = newElement('y:BorderStyle','type','dashed')
-  gFill = newElement('y:Fill','color',g.!COLOR_JCLLIB_NODE)
+  gFill = newElement('y:Fill','color',g.0COLOR_JCLLIB_NODE)
   gNode = newShapeNode(jcllib,sLabel,'roundrectangle',gBorderStyle,,
                        gFill)
 return gNode
@@ -1847,9 +1847,9 @@ newSetNode: procedure expose g.
     var = word(vars,i)
     sName = getAttribute(var,'name')
     sValue = getAttribute(var,'value')
-    sLabel = sLabel || g.!LF || 'SET' sName'='sValue
+    sLabel = sLabel || g.0LF || 'SET' sName'='sValue
   end
-  gFill = newElement('y:Fill','color',g.!COLOR_SET_NODE)
+  gFill = newElement('y:Fill','color',g.0COLOR_SET_NODE)
   gNode = newShapeNode(set,substr(sLabel,2),,gFill)
 return gNode
 
@@ -1861,17 +1861,17 @@ newIncludeNode: procedure expose g.
   parse arg include
   /* Get any var names too */
   sLabel = 'INCLUDE' getAttribute(include,'member')
-  gFill = newElement('y:Fill','color',g.!COLOR_INCLUDE_NODE)
+  gFill = newElement('y:Fill','color',g.0COLOR_INCLUDE_NODE)
   gNode = newShapeNode(include,sLabel,,gFill)
 return gNode
 
 getLabelDimension: procedure expose g.
   parse arg sLabel
-  if pos(g.!LF,sLabel) > 0
+  if pos(g.0LF,sLabel) > 0
   then do /* compute dimensions of a multi-line label */
     nChars = 10 /* minimum width */
     do nLines = 1 by 1 until length(sLabel) = 0
-      parse var sLabel sLine (g.!LF) sLabel
+      parse var sLabel sLine (g.0LF) sLabel
       nChars = max(nChars,length(sLine))
     end
   end
@@ -1911,7 +1911,7 @@ newImageNode: procedure expose g.
   call appendChild createTextNode(sLabel),gNodeLabel
   gImage = newElement('y:Image','href',sImage)
   call appendChild gImage,gImageNode
-  call appendChild gNode,g.!GRAPH
+  call appendChild gNode,g.0GRAPH
 return gNode
 
 newArrow: procedure expose g.
@@ -1955,28 +1955,28 @@ newLine: procedure expose g.
   end
   gBendStyle = newElement('y:BendStyle','smoothed','true')
   call appendChild gBendStyle,gPolyLineEdge
-  call appendChild gEdge,g.!GRAPH
+  call appendChild gEdge,g.0GRAPH
 return gEdge
 
 prettyJCL: procedure expose g.
   parse arg sFileOut,node
-  g.!FILEOUT = ''
-  g.!INDENT = 0
+  g.0FILEOUT = ''
+  g.0INDENT = 0
   if sFileOut <> ''
   then do
-    g.!FILEOUT = openFile(sFileOut,'OUTPUT')
-    if g.!rc = 0
+    g.0FILEOUT = openFile(sFileOut,'OUTPUT')
+    if g.0rc = 0
     then say 'JCL011I Creating' sFileOut
     else do
       say 'JCL012E Could not create' sFileOut'. Writing to console...'
-      g.!FILEOUT = '' /* null handle means write to console */
+      g.0FILEOUT = '' /* null handle means write to console */
     end
   end
   call emitJCL node
-  if g.!FILEOUT <> ''
+  if g.0FILEOUT <> ''
   then do
     say 'JCL013I Created' sFileOut
-    rc = closeFile(g.!FILEOUT)
+    rc = closeFile(g.0FILEOUT)
   end
 return
 
@@ -1985,7 +1985,7 @@ emitJCL: procedure expose g.
   if isCommentNode(node) then return /* ignore XML comments */
   if isCDATA(node)
   then do
-    call Say strip(getText(node),'TRAILING',g.!LF)
+    call Say strip(getText(node),'TRAILING',g.0LF)
     return
   end
   sElement = getNodeName(node)
@@ -2083,11 +2083,11 @@ emitJobStatement: procedure expose g.
   sPositionals = '('sAcct','sAcctInfo'),'sProg
   sOperands = sPositionals
   call getAttributeMap node
-  do i = 1 to g.!ATTRIBUTE.0
-    sKey = g.!ATTRIBUTE.i
+  do i = 1 to g.0ATTRIBUTE.0
+    sKey = g.0ATTRIBUTE.i
     if left(sKey,1) <> '_' & wordpos(sKey,'acct acctinfo pgmr') = 0
     then do
-      sValue = g.!ATTRIBUTE.sKey
+      sValue = g.0ATTRIBUTE.sKey
       sOperands = sOperands','toUpper(sKey)'='sValue
     end
   end
@@ -2108,12 +2108,12 @@ emitStatement: procedure expose g.
    k.1 = sPositionals
   end
   call getAttributeMap node
-  do i = 1 to g.!ATTRIBUTE.0
-    sKey = g.!ATTRIBUTE.i
+  do i = 1 to g.0ATTRIBUTE.0
+    sKey = g.0ATTRIBUTE.i
     if left(sKey,1) <> '_' & wordpos(sKey,sIgnored) = 0
     then do
       nKeywords = nKeywords + 1
-      sValue = g.!ATTRIBUTE.sKey
+      sValue = g.0ATTRIBUTE.sKey
       k.nKeywords = toUpper(sKey)'='sValue
     end
   end
@@ -2144,11 +2144,11 @@ getKeywords: procedure expose g.
   sPositionals = getAttribute(node,'_')
   sKeywords = ''
   call getAttributeMap node
-  do i = 1 to g.!ATTRIBUTE.0
-    sKey = g.!ATTRIBUTE.i
+  do i = 1 to g.0ATTRIBUTE.0
+    sKey = g.0ATTRIBUTE.i
     if left(sKey,1) <> '_' & wordpos(sKey,sIgnored) = 0
     then do
-      sValue = g.!ATTRIBUTE.sKey
+      sValue = g.0ATTRIBUTE.sKey
       sKeywords = sKeywords','toUpper(sKey)'='sValue
     end
   end
@@ -2169,33 +2169,33 @@ return
 setOptions: procedure expose g.
   parse arg sOptions
   /* set default options... */
-  g.!OPTION.WRAP.1 = 255 /* only when WRAP option is active    */
-  g.!OPTION.GRAPHML  = 1 /* Output GraphML file?               */
-  g.!OPTION.XML      = 1 /* Output XML file?                   */
-  g.!OPTION.JCL      = 0 /* Output JCL file?                   */
-  g.!OPTION.INLINE   = 1 /* Draw instream data?                */
-  g.!OPTION.SYSOUT   = 1 /* Draw DD SYSOUT=x nodes?            */
-  g.!OPTION.DUMMY    = 1 /* Draw DD DUMMY nodes?               */
-  g.!OPTION.TRACE    = 0 /* Trace parsing of JCL?              */
-  g.!OPTION.ENCODING = 1 /* Emit encoding="xxx" in XML prolog? */
-  g.!OPTION.WRAP     = 0 /* Wrap output?                       */
-  if g.!ENV = 'TSO' then g.!OPTION.WRAP = 1 /* TSO is special  */
-  g.!OPTION.LINE     = 0 /* Output XML _line attributes?       */
-  g.!OPTION.ID       = 0 /* Output XML _id attributes?         */
-  g.!OPTION.JES3     = 1 /* Process JES3 statements?           */
+  g.0OPTION.WRAP.1 = 255 /* only when WRAP option is active    */
+  g.0OPTION.GRAPHML  = 1 /* Output GraphML file?               */
+  g.0OPTION.XML      = 1 /* Output XML file?                   */
+  g.0OPTION.JCL      = 0 /* Output JCL file?                   */
+  g.0OPTION.INLINE   = 1 /* Draw instream data?                */
+  g.0OPTION.SYSOUT   = 1 /* Draw DD SYSOUT=x nodes?            */
+  g.0OPTION.DUMMY    = 1 /* Draw DD DUMMY nodes?               */
+  g.0OPTION.TRACE    = 0 /* Trace parsing of JCL?              */
+  g.0OPTION.ENCODING = 1 /* Emit encoding="xxx" in XML prolog? */
+  g.0OPTION.WRAP     = 0 /* Wrap output?                       */
+  if g.0ENV = 'TSO' then g.0OPTION.WRAP = 1 /* TSO is special  */
+  g.0OPTION.LINE     = 0 /* Output XML _line attributes?       */
+  g.0OPTION.ID       = 0 /* Output XML _id attributes?         */
+  g.0OPTION.JES3     = 1 /* Process JES3 statements?           */
   do i = 1 to words(sOptions)
     sOption = word(sOptions,i)
     if left(sOption,2) = 'NO'
     then do
       sOption = substr(sOption,3)
-      g.!OPTION.sOption = 0
+      g.0OPTION.sOption = 0
     end
     else do
-      g.!OPTION.sOption = 1
+      g.0OPTION.sOption = 1
       sNextWord = word(sOptions,i+1)                     /* 20070208 */
       if datatype(sNextWord,'WHOLE')
       then do
-        g.!OPTION.sOption.1 = sNextWord
+        g.0OPTION.sOption.1 = sNextWord
         i = i + 1
       end                                                /* 20070208 */
     end
@@ -2203,233 +2203,233 @@ setOptions: procedure expose g.
 return
 
 Prolog:
-  if g.!ENV = 'TSO'
-  then g.!LF = '15'x
-  else g.!LF = '0A'x
+  if g.0ENV = 'TSO'
+  then g.0LF = '15'x
+  else g.0LF = '0A'x
 
-  g.!UPPER = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-  g.!LOWER = 'abcdefghijklmnopqrstuvwxyz'
+  g.0UPPER = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+  g.0LOWER = 'abcdefghijklmnopqrstuvwxyz'
 
-  g.!LONGEST_LINE             = 0   /* longest output line found     */
+  g.0LONGEST_LINE             = 0   /* longest output line found     */
 
-  g.!K = 0
-  g.!KDELTA = 0
+  g.0K = 0
+  g.0KDELTA = 0
 
-  g.!JCLTYPE_UNKNOWN   = 0; g.!JCLTYPE.0 = '?'
-  g.!JCLTYPE_STATEMENT = 1; g.!JCLTYPE.1 = 'STMT'
-  g.!JCLTYPE_DATA      = 2; g.!JCLTYPE.2 = 'DATA'
-  g.!JCLTYPE_COMMENT   = 3; g.!JCLTYPE.3 = '//*'
-  g.!JCLTYPE_EOJ       = 4; g.!JCLTYPE.4 = '//'
-  g.!JCLTYPE_JES2CMD   = 5; g.!JCLTYPE.5 = '/*$'
-  g.!JCLTYPE_JES2STMT  = 6; g.!JCLTYPE.6 = 'JES2'
-  g.!JCLTYPE_JES3STMT  = 7; g.!JCLTYPE.7 = 'JES3'
-  g.!JCLTYPE_OPCDIR    = 8; g.!JCLTYPE.8 = 'OPC'        /* HF 061218 */
+  g.0JCLTYPE_UNKNOWN   = 0; g.0JCLTYPE.0 = '?'
+  g.0JCLTYPE_STATEMENT = 1; g.0JCLTYPE.1 = 'STMT'
+  g.0JCLTYPE_DATA      = 2; g.0JCLTYPE.2 = 'DATA'
+  g.0JCLTYPE_COMMENT   = 3; g.0JCLTYPE.3 = '//*'
+  g.0JCLTYPE_EOJ       = 4; g.0JCLTYPE.4 = '//'
+  g.0JCLTYPE_JES2CMD   = 5; g.0JCLTYPE.5 = '/*$'
+  g.0JCLTYPE_JES2STMT  = 6; g.0JCLTYPE.6 = 'JES2'
+  g.0JCLTYPE_JES3STMT  = 7; g.0JCLTYPE.7 = 'JES3'
+  g.0JCLTYPE_OPCDIR    = 8; g.0JCLTYPE.8 = 'OPC'        /* HF 061218 */
 
   call setStandardColors
 
   /* Set up your color scheme here...*/
-  g.!COLOR_WHITE        = g.!COLOR.white
-  g.!COLOR_PARMS_NODE   = g.!COLOR.white
-  g.!COLOR_INLINE_NODE  = g.!COLOR.white
-  g.!COLOR_SHAPE_NODE   = g.!COLOR.lavender /* default shape color */
-  g.!COLOR_SET_NODE     = g.!COLOR.aliceblue
-  g.!COLOR_INCLUDE_NODE = g.!COLOR.whitesmoke
-  g.!COLOR_IF_NODE      = g.!COLOR.gold
-  g.!COLOR_JCLLIB_NODE  = g.!COLOR.lavender
-  g.!COLOR_JOB_NODE     = '#ccffcc' /* light green */
-  g.!COLOR_PROC_NODE    = '#e3ffe3' /* lighter green */
-  g.!COLOR_EOJ_NODE     = '#ff5c5c' /* light red */
-  g.!COLOR_PEND_NODE    = g.!COLOR.mistyrose
-  g.!COLOR_STEP_NODE    = g.!COLOR.beige
-  g.!COLOR_CONTROL_FLOW = g.!COLOR.red
-  g.!COLOR_DATA_FLOW    = g.!COLOR.black
-  g.!COLOR_DROP_SHADOW  = '#e0e0e0' /* very light gray */
-  drop g.!COLOR.   /* we dont need these anymore */
+  g.0COLOR_WHITE        = g.0COLOR.white
+  g.0COLOR_PARMS_NODE   = g.0COLOR.white
+  g.0COLOR_INLINE_NODE  = g.0COLOR.white
+  g.0COLOR_SHAPE_NODE   = g.0COLOR.lavender /* default shape color */
+  g.0COLOR_SET_NODE     = g.0COLOR.aliceblue
+  g.0COLOR_INCLUDE_NODE = g.0COLOR.whitesmoke
+  g.0COLOR_IF_NODE      = g.0COLOR.gold
+  g.0COLOR_JCLLIB_NODE  = g.0COLOR.lavender
+  g.0COLOR_JOB_NODE     = '#ccffcc' /* light green */
+  g.0COLOR_PROC_NODE    = '#e3ffe3' /* lighter green */
+  g.0COLOR_EOJ_NODE     = '#ff5c5c' /* light red */
+  g.0COLOR_PEND_NODE    = g.0COLOR.mistyrose
+  g.0COLOR_STEP_NODE    = g.0COLOR.beige
+  g.0COLOR_CONTROL_FLOW = g.0COLOR.red
+  g.0COLOR_DATA_FLOW    = g.0COLOR.black
+  g.0COLOR_DROP_SHADOW  = '#e0e0e0' /* very light gray */
+  drop g.0COLOR.   /* we dont need these anymore */
 return
 
 
 setStandardColors: procedure expose g.
   /* These are the standard SVG color names in order of increasing
      brightness. The brightness value is show as a comment...*/
-  g.!COLOR.black = '#000000'                    /*   0 */
-  g.!COLOR.maroon = '#800000'                   /*  14 */
-  g.!COLOR.darkred = '#8B0000'                  /*  15 */
-  g.!COLOR.red = '#FF0000'                      /*  28 */
-  g.!COLOR.navy = '#000080'                     /*  38 */
-  g.!COLOR.darkblue = '#00008B'                 /*  42 */
-  g.!COLOR.indigo = '#4B0082'                   /*  47 */
-  g.!COLOR.firebrick = '#B22222'                /*  50 */
-  g.!COLOR.midnightblue = '#191970'             /*  51 */
-  g.!COLOR.purple = '#800080'                   /*  52 */
-  g.!COLOR.crimson = '#DC143C'                  /*  54 */
-  g.!COLOR.brown = '#A52A2A'                    /*  56 */
-  g.!COLOR.darkmagenta = '#8B008B'              /*  57 */
-  g.!COLOR.darkgreen = '#006400'                /*  59 */
-  g.!COLOR.mediumblue = '#0000CD'               /*  62 */
-  g.!COLOR.saddlebrown = '#8B4513'              /*  62 */
-  g.!COLOR.orangered = '#FF4500'                /*  69 */
-  g.!COLOR.mediumvioletred = '#C71585'          /*  74 */
-  g.!COLOR.darkslategray = '#2F4F4F'            /*  75 */
-  g.!COLOR.darkslategrey = '#2F4F4F'            /*  75 */
-  g.!COLOR.green = '#008000'                    /*  76 */
-  g.!COLOR.blue = '#0000FF'                     /*  77 */
-  g.!COLOR.sienna = '#A0522D'                   /*  79 */
-  g.!COLOR.darkviolet = '#9400D3'               /*  80 */
-  g.!COLOR.deeppink = '#FF1493'                 /*  84 */
-  g.!COLOR.darkslateblue = '#483D8B'            /*  86 */
-  g.!COLOR.darkolivegreen = '#556B2F'           /*  87 */
-  g.!COLOR.olive = '#808000'                    /*  90 */
-  g.!COLOR.chocolate = '#D2691E'                /*  94 */
-  g.!COLOR.forestgreen = '#228B22'              /*  96 */
-  g.!COLOR.darkgoldenrod = '#B8860B'            /* 103 */
-  g.!COLOR.indianred = '#CD5C5C'                /* 104 */
-  g.!COLOR.fuchsia = '#FF00FF'                  /* 105 */
-  g.!COLOR.magenta = '#FF00FF'                  /* 105 */
-  g.!COLOR.dimgray = '#696969'                  /* 105 */
-  g.!COLOR.dimgrey = '#696969'                  /* 105 */
-  g.!COLOR.olivedrab = '#6B8E23'                /* 106 */
-  g.!COLOR.darkorchid = '#9932CC'               /* 108 */
-  g.!COLOR.tomato = '#FF6347'                   /* 108 */
-  g.!COLOR.blueviolet = '#8A2BE2'               /* 108 */
-  g.!COLOR.darkorange = '#FF8C00'               /* 111 */
-  g.!COLOR.seagreen = '#2E8B57'                 /* 113 */
-  g.!COLOR.teal = '#008080'                     /* 114 */
-  g.!COLOR.peru = '#CD853F'                     /* 120 */
-  g.!COLOR.darkcyan = '#008B8B'                 /* 124 */
-  g.!COLOR.orange = '#FFA500'                   /* 125 */
-  g.!COLOR.slateblue = '#6A5ACD'                /* 126 */
-  g.!COLOR.coral = '#FF7F50'                    /* 127 */
-  g.!COLOR.gray = '#808080'                     /* 128 */
-  g.!COLOR.grey = '#808080'                     /* 128 */
-  g.!COLOR.goldenrod = '#DAA520'                /* 131 */
-  g.!COLOR.slategray = '#708090'                /* 131 */
-  g.!COLOR.slategrey = '#708090'                /* 131 */
-  g.!COLOR.mediumorchid = '#BA55D3'             /* 134 */
-  g.!COLOR.palevioletred = '#DB7093'            /* 134 */
-  g.!COLOR.royalblue = '#4169E1'                /* 137 */
-  g.!COLOR.salmon = '#FA8072'                   /* 137 */
-  g.!COLOR.steelblue = '#4682B4'                /* 138 */
-  g.!COLOR.lightslategray = '#778899'           /* 139 */
-  g.!COLOR.lightslategrey = '#778899'           /* 139 */
-  g.!COLOR.lightcoral = '#F08080'               /* 140 */
-  g.!COLOR.limegreen = '#32CD32'                /* 141 */
-  g.!COLOR.hotpink = '#FF69B4'                  /* 144 */
-  g.!COLOR.mediumseagreen = '#3CB371'           /* 146 */
-  g.!COLOR.mediumslateblue = '#7B68EE'          /* 146 */
-  g.!COLOR.rosybrown = '#BC8F8F'                /* 148 */
-  g.!COLOR.mediumpurple = '#9370DB'             /* 148 */
-  g.!COLOR.lime = '#00FF00'                     /* 150 */
-  g.!COLOR.darksalmon = '#E9967A'               /* 151 */
-  g.!COLOR.cadetblue = '#5F9EA0'                /* 152 */
-  g.!COLOR.sandybrown = '#F4A460'               /* 152 */
-  g.!COLOR.yellowgreen = '#9ACD32'              /* 153 */
-  g.!COLOR.orchid = '#DA70D6'                   /* 154 */
-  g.!COLOR.gold = '#FFD700'                     /* 155 */
-  g.!COLOR.lightsalmon = '#FFA07A'              /* 159 */
-  g.!COLOR.lightseagreen = '#20B2AA'            /* 160 */
-  g.!COLOR.darkkhaki = '#BDB76B'                /* 161 */
-  g.!COLOR.lawngreen = '#7CFC00'                /* 162 */
-  g.!COLOR.chartreuse = '#7FFF00'               /* 164 */
-  g.!COLOR.dodgerblue = '#1E90FF'               /* 165 */
-  g.!COLOR.darkgray = '#A9A9A9'                 /* 169 */
-  g.!COLOR.darkgrey = '#A9A9A9'                 /* 169 */
-  g.!COLOR.darkseagreen = '#8FBC8F'             /* 170 */
-  g.!COLOR.cornflowerblue = '#6495ED'           /* 170 */
-  g.!COLOR.tan = '#D2B48C'                      /* 171 */
-  g.!COLOR.burlywood = '#DEB887'                /* 173 */
-  g.!COLOR.violet = '#EE82EE'                   /* 174 */
-  g.!COLOR.yellow = '#FFFF00'                   /* 179 */
-  g.!COLOR.mediumaquamarine = '#66CDAA'         /* 183 */
-  g.!COLOR.greenyellow = '#ADFF2F'              /* 184 */
-  g.!COLOR.darkturquoise = '#00CED1'            /* 184 */
-  g.!COLOR.plum = '#DDA0DD'                     /* 185 */
-  g.!COLOR.springgreen = '#00FF7F'              /* 189 */
-  g.!COLOR.deepskyblue = '#00BFFF'              /* 189 */
-  g.!COLOR.silver = '#C0C0C0'                   /* 192 */
-  g.!COLOR.mediumturquoise = '#48D1CC'          /* 192 */
-  g.!COLOR.lightpink = '#FFB6C1'                /* 193 */
-  g.!COLOR.mediumspringgreen = '#00FA9A'        /* 194 */
-  g.!COLOR.lightgreen = '#90EE90'               /* 199 */
-  g.!COLOR.thistle = '#D8BFD8'                  /* 201 */
-  g.!COLOR.turquoise = '#40E0D0'                /* 202 */
-  g.!COLOR.lightsteelblue = '#B0C4DE'           /* 202 */
-  g.!COLOR.pink = '#FFC0CB'                     /* 202 */
-  g.!COLOR.khaki = '#F0E68C'                    /* 204 */
-  g.!COLOR.skyblue = '#87CEEB'                  /* 207 */
-  g.!COLOR.palegreen = '#98FB98'                /* 210 */
-  g.!COLOR.navajowhite = '#FFDEAD'              /* 211 */
-  g.!COLOR.lightgray = '#D3D3D3'                /* 211 */
-  g.!COLOR.lightgrey = '#D3D3D3'                /* 211 */
-  g.!COLOR.lightskyblue = '#87CEFA'             /* 211 */
-  g.!COLOR.wheat = '#F5DEB3'                    /* 212 */
-  g.!COLOR.peachpuff = '#FFDAB9'                /* 212 */
-  g.!COLOR.palegoldenrod = '#EEE8AA'            /* 214 */
-  g.!COLOR.lightblue = '#ADD8E6'                /* 215 */
-  g.!COLOR.moccasin = '#FFE4B5'                 /* 217 */
-  g.!COLOR.gainsboro = '#DCDCDC'                /* 220 */
-  g.!COLOR.powderblue = '#B0E0E6'               /* 221 */
-  g.!COLOR.bisque = '#FFE4C4'                   /* 221 */
-  g.!COLOR.aqua = '#00FFFF'                     /* 227 */
-  g.!COLOR.cyan = '#00FFFF'                     /* 227 */
-  g.!COLOR.aquamarine = '#7FFFD4'               /* 228 */
-  g.!COLOR.blanchedalmond = '#FFEBCD'           /* 228 */
-  g.!COLOR.mistyrose = '#FFE4E1'                /* 230 */
-  g.!COLOR.antiquewhite = '#FAEBD7'             /* 231 */
-  g.!COLOR.paleturquoise = '#AFEEEE'            /* 231 */
-  g.!COLOR.papayawhip = '#FFEFD5'               /* 233 */
-  g.!COLOR.lavender = '#E6E6FA'                 /* 236 */
-  g.!COLOR.lemonchiffon = '#FFFACD'             /* 237 */
-  g.!COLOR.beige = '#F5F5DC'                    /* 238 */
-  g.!COLOR.lightgoldenrodyellow = '#FAFAD2'     /* 238 */
-  g.!COLOR.linen = '#FAF0E6'                    /* 238 */
-  g.!COLOR.cornsilk = '#FFF8DC'                 /* 240 */
-  g.!COLOR.oldlace = '#FDF5E6'                  /* 241 */
-  g.!COLOR.lavenderblush = '#FFF0F5'            /* 243 */
-  g.!COLOR.seashell = '#FFF5EE'                 /* 244 */
-  g.!COLOR.whitesmoke = '#F5F5F5'               /* 245 */
-  g.!COLOR.lightyellow = '#FFFFE0'              /* 246 */
-  g.!COLOR.floralwhite = '#FFFAF0'              /* 248 */
-  g.!COLOR.honeydew = '#F0FFF0'                 /* 249 */
-  g.!COLOR.aliceblue = '#F0F8FF'                /* 249 */
-  g.!COLOR.ghostwhite = '#F8F8FF'               /* 250 */
-  g.!COLOR.ivory = '#FFFFF0'                    /* 251 */
-  g.!COLOR.snow = '#FFFAFA'                     /* 251 */
-  g.!COLOR.lightcyan = '#E0FFFF'                /* 252 */
-  g.!COLOR.mintcream = '#F5FFFA'                /* 252 */
-  g.!COLOR.azure = '#F0FFFF'                    /* 253 */
-  g.!COLOR.white = '#FFFFFF'                    /* 255 */
+  g.0COLOR.black = '#000000'                    /*   0 */
+  g.0COLOR.maroon = '#800000'                   /*  14 */
+  g.0COLOR.darkred = '#8B0000'                  /*  15 */
+  g.0COLOR.red = '#FF0000'                      /*  28 */
+  g.0COLOR.navy = '#000080'                     /*  38 */
+  g.0COLOR.darkblue = '#00008B'                 /*  42 */
+  g.0COLOR.indigo = '#4B0082'                   /*  47 */
+  g.0COLOR.firebrick = '#B22222'                /*  50 */
+  g.0COLOR.midnightblue = '#191970'             /*  51 */
+  g.0COLOR.purple = '#800080'                   /*  52 */
+  g.0COLOR.crimson = '#DC143C'                  /*  54 */
+  g.0COLOR.brown = '#A52A2A'                    /*  56 */
+  g.0COLOR.darkmagenta = '#8B008B'              /*  57 */
+  g.0COLOR.darkgreen = '#006400'                /*  59 */
+  g.0COLOR.mediumblue = '#0000CD'               /*  62 */
+  g.0COLOR.saddlebrown = '#8B4513'              /*  62 */
+  g.0COLOR.orangered = '#FF4500'                /*  69 */
+  g.0COLOR.mediumvioletred = '#C71585'          /*  74 */
+  g.0COLOR.darkslategray = '#2F4F4F'            /*  75 */
+  g.0COLOR.darkslategrey = '#2F4F4F'            /*  75 */
+  g.0COLOR.green = '#008000'                    /*  76 */
+  g.0COLOR.blue = '#0000FF'                     /*  77 */
+  g.0COLOR.sienna = '#A0522D'                   /*  79 */
+  g.0COLOR.darkviolet = '#9400D3'               /*  80 */
+  g.0COLOR.deeppink = '#FF1493'                 /*  84 */
+  g.0COLOR.darkslateblue = '#483D8B'            /*  86 */
+  g.0COLOR.darkolivegreen = '#556B2F'           /*  87 */
+  g.0COLOR.olive = '#808000'                    /*  90 */
+  g.0COLOR.chocolate = '#D2691E'                /*  94 */
+  g.0COLOR.forestgreen = '#228B22'              /*  96 */
+  g.0COLOR.darkgoldenrod = '#B8860B'            /* 103 */
+  g.0COLOR.indianred = '#CD5C5C'                /* 104 */
+  g.0COLOR.fuchsia = '#FF00FF'                  /* 105 */
+  g.0COLOR.magenta = '#FF00FF'                  /* 105 */
+  g.0COLOR.dimgray = '#696969'                  /* 105 */
+  g.0COLOR.dimgrey = '#696969'                  /* 105 */
+  g.0COLOR.olivedrab = '#6B8E23'                /* 106 */
+  g.0COLOR.darkorchid = '#9932CC'               /* 108 */
+  g.0COLOR.tomato = '#FF6347'                   /* 108 */
+  g.0COLOR.blueviolet = '#8A2BE2'               /* 108 */
+  g.0COLOR.darkorange = '#FF8C00'               /* 111 */
+  g.0COLOR.seagreen = '#2E8B57'                 /* 113 */
+  g.0COLOR.teal = '#008080'                     /* 114 */
+  g.0COLOR.peru = '#CD853F'                     /* 120 */
+  g.0COLOR.darkcyan = '#008B8B'                 /* 124 */
+  g.0COLOR.orange = '#FFA500'                   /* 125 */
+  g.0COLOR.slateblue = '#6A5ACD'                /* 126 */
+  g.0COLOR.coral = '#FF7F50'                    /* 127 */
+  g.0COLOR.gray = '#808080'                     /* 128 */
+  g.0COLOR.grey = '#808080'                     /* 128 */
+  g.0COLOR.goldenrod = '#DAA520'                /* 131 */
+  g.0COLOR.slategray = '#708090'                /* 131 */
+  g.0COLOR.slategrey = '#708090'                /* 131 */
+  g.0COLOR.mediumorchid = '#BA55D3'             /* 134 */
+  g.0COLOR.palevioletred = '#DB7093'            /* 134 */
+  g.0COLOR.royalblue = '#4169E1'                /* 137 */
+  g.0COLOR.salmon = '#FA8072'                   /* 137 */
+  g.0COLOR.steelblue = '#4682B4'                /* 138 */
+  g.0COLOR.lightslategray = '#778899'           /* 139 */
+  g.0COLOR.lightslategrey = '#778899'           /* 139 */
+  g.0COLOR.lightcoral = '#F08080'               /* 140 */
+  g.0COLOR.limegreen = '#32CD32'                /* 141 */
+  g.0COLOR.hotpink = '#FF69B4'                  /* 144 */
+  g.0COLOR.mediumseagreen = '#3CB371'           /* 146 */
+  g.0COLOR.mediumslateblue = '#7B68EE'          /* 146 */
+  g.0COLOR.rosybrown = '#BC8F8F'                /* 148 */
+  g.0COLOR.mediumpurple = '#9370DB'             /* 148 */
+  g.0COLOR.lime = '#00FF00'                     /* 150 */
+  g.0COLOR.darksalmon = '#E9967A'               /* 151 */
+  g.0COLOR.cadetblue = '#5F9EA0'                /* 152 */
+  g.0COLOR.sandybrown = '#F4A460'               /* 152 */
+  g.0COLOR.yellowgreen = '#9ACD32'              /* 153 */
+  g.0COLOR.orchid = '#DA70D6'                   /* 154 */
+  g.0COLOR.gold = '#FFD700'                     /* 155 */
+  g.0COLOR.lightsalmon = '#FFA07A'              /* 159 */
+  g.0COLOR.lightseagreen = '#20B2AA'            /* 160 */
+  g.0COLOR.darkkhaki = '#BDB76B'                /* 161 */
+  g.0COLOR.lawngreen = '#7CFC00'                /* 162 */
+  g.0COLOR.chartreuse = '#7FFF00'               /* 164 */
+  g.0COLOR.dodgerblue = '#1E90FF'               /* 165 */
+  g.0COLOR.darkgray = '#A9A9A9'                 /* 169 */
+  g.0COLOR.darkgrey = '#A9A9A9'                 /* 169 */
+  g.0COLOR.darkseagreen = '#8FBC8F'             /* 170 */
+  g.0COLOR.cornflowerblue = '#6495ED'           /* 170 */
+  g.0COLOR.tan = '#D2B48C'                      /* 171 */
+  g.0COLOR.burlywood = '#DEB887'                /* 173 */
+  g.0COLOR.violet = '#EE82EE'                   /* 174 */
+  g.0COLOR.yellow = '#FFFF00'                   /* 179 */
+  g.0COLOR.mediumaquamarine = '#66CDAA'         /* 183 */
+  g.0COLOR.greenyellow = '#ADFF2F'              /* 184 */
+  g.0COLOR.darkturquoise = '#00CED1'            /* 184 */
+  g.0COLOR.plum = '#DDA0DD'                     /* 185 */
+  g.0COLOR.springgreen = '#00FF7F'              /* 189 */
+  g.0COLOR.deepskyblue = '#00BFFF'              /* 189 */
+  g.0COLOR.silver = '#C0C0C0'                   /* 192 */
+  g.0COLOR.mediumturquoise = '#48D1CC'          /* 192 */
+  g.0COLOR.lightpink = '#FFB6C1'                /* 193 */
+  g.0COLOR.mediumspringgreen = '#00FA9A'        /* 194 */
+  g.0COLOR.lightgreen = '#90EE90'               /* 199 */
+  g.0COLOR.thistle = '#D8BFD8'                  /* 201 */
+  g.0COLOR.turquoise = '#40E0D0'                /* 202 */
+  g.0COLOR.lightsteelblue = '#B0C4DE'           /* 202 */
+  g.0COLOR.pink = '#FFC0CB'                     /* 202 */
+  g.0COLOR.khaki = '#F0E68C'                    /* 204 */
+  g.0COLOR.skyblue = '#87CEEB'                  /* 207 */
+  g.0COLOR.palegreen = '#98FB98'                /* 210 */
+  g.0COLOR.navajowhite = '#FFDEAD'              /* 211 */
+  g.0COLOR.lightgray = '#D3D3D3'                /* 211 */
+  g.0COLOR.lightgrey = '#D3D3D3'                /* 211 */
+  g.0COLOR.lightskyblue = '#87CEFA'             /* 211 */
+  g.0COLOR.wheat = '#F5DEB3'                    /* 212 */
+  g.0COLOR.peachpuff = '#FFDAB9'                /* 212 */
+  g.0COLOR.palegoldenrod = '#EEE8AA'            /* 214 */
+  g.0COLOR.lightblue = '#ADD8E6'                /* 215 */
+  g.0COLOR.moccasin = '#FFE4B5'                 /* 217 */
+  g.0COLOR.gainsboro = '#DCDCDC'                /* 220 */
+  g.0COLOR.powderblue = '#B0E0E6'               /* 221 */
+  g.0COLOR.bisque = '#FFE4C4'                   /* 221 */
+  g.0COLOR.aqua = '#00FFFF'                     /* 227 */
+  g.0COLOR.cyan = '#00FFFF'                     /* 227 */
+  g.0COLOR.aquamarine = '#7FFFD4'               /* 228 */
+  g.0COLOR.blanchedalmond = '#FFEBCD'           /* 228 */
+  g.0COLOR.mistyrose = '#FFE4E1'                /* 230 */
+  g.0COLOR.antiquewhite = '#FAEBD7'             /* 231 */
+  g.0COLOR.paleturquoise = '#AFEEEE'            /* 231 */
+  g.0COLOR.papayawhip = '#FFEFD5'               /* 233 */
+  g.0COLOR.lavender = '#E6E6FA'                 /* 236 */
+  g.0COLOR.lemonchiffon = '#FFFACD'             /* 237 */
+  g.0COLOR.beige = '#F5F5DC'                    /* 238 */
+  g.0COLOR.lightgoldenrodyellow = '#FAFAD2'     /* 238 */
+  g.0COLOR.linen = '#FAF0E6'                    /* 238 */
+  g.0COLOR.cornsilk = '#FFF8DC'                 /* 240 */
+  g.0COLOR.oldlace = '#FDF5E6'                  /* 241 */
+  g.0COLOR.lavenderblush = '#FFF0F5'            /* 243 */
+  g.0COLOR.seashell = '#FFF5EE'                 /* 244 */
+  g.0COLOR.whitesmoke = '#F5F5F5'               /* 245 */
+  g.0COLOR.lightyellow = '#FFFFE0'              /* 246 */
+  g.0COLOR.floralwhite = '#FFFAF0'              /* 248 */
+  g.0COLOR.honeydew = '#F0FFF0'                 /* 249 */
+  g.0COLOR.aliceblue = '#F0F8FF'                /* 249 */
+  g.0COLOR.ghostwhite = '#F8F8FF'               /* 250 */
+  g.0COLOR.ivory = '#FFFFF0'                    /* 251 */
+  g.0COLOR.snow = '#FFFAFA'                     /* 251 */
+  g.0COLOR.lightcyan = '#E0FFFF'                /* 252 */
+  g.0COLOR.mintcream = '#F5FFFA'                /* 252 */
+  g.0COLOR.azure = '#F0FFFF'                    /* 253 */
+  g.0COLOR.white = '#FFFFFF'                    /* 255 */
 return
 
 Epilog: procedure expose g.
-  if g.!LONGEST_LINE > g.!OPTION.WRAP.1
+  if g.0LONGEST_LINE > g.0OPTION.WRAP.1
   then say 'JCL010W To avoid output line truncation, specify: (WRAP',
-           g.!LONGEST_LINE
+           g.0LONGEST_LINE
 return
 
 prettyPrinter: procedure expose g.
-  parse arg sFileOut,g.!TAB,node
-  if g.!TAB = '' then g.!TAB = 2 /* indentation amount */
+  parse arg sFileOut,g.0TAB,node
+  if g.0TAB = '' then g.0TAB = 2 /* indentation amount */
   if node = '' then node = getRoot()
-  g.!INDENT = 0
-  g.!FILEOUT = ''
+  g.0INDENT = 0
+  g.0FILEOUT = ''
   if sFileOut <> ''
   then do
-    g.!FILEOUT = openFile(sFileOut,'OUTPUT')
-    if g.!rc = 0
+    g.0FILEOUT = openFile(sFileOut,'OUTPUT')
+    if g.0rc = 0
     then say 'JCL006I Creating' sFileOut
     else do
       say 'JCL007E Could not create' sFileOut'. Writing to console...'
-      g.!FILEOUT = '' /* null handle means write to console */
+      g.0FILEOUT = '' /* null handle means write to console */
     end
   end
   call _setDefaultEntities
   call emitProlog
-  g.!INDENT = -g.!TAB
+  g.0INDENT = -g.0TAB
   call showNode node
-  if g.!FILEOUT <> ''
+  if g.0FILEOUT <> ''
   then do
     say 'JCL008I Created' sFileOut
-    rc = closeFile(g.!FILEOUT)
+    rc = closeFile(g.0FILEOUT)
   end
 return
 
@@ -2443,8 +2443,8 @@ emitProlog: procedure expose g.
   if g.?xml.standalone = ''
   then sStandalone = 'yes'
   else sStandalone = g.?xml.standalone
-  g.!INDENT = 0
-  if g.!OPTION.ENCODING
+  g.0INDENT = 0
+  if g.0OPTION.ENCODING
   then call Say '<?xml version="'sVersion'"',
                      'encoding="'sEncoding'"',
                    'standalone="'sStandalone'"?>'
@@ -2457,24 +2457,24 @@ return
 
 showNode: procedure expose g.
   parse arg node
-  g.!INDENT = g.!INDENT + g.!TAB
+  g.0INDENT = g.0INDENT + g.0TAB
   select
     when isTextNode(node)    then call emitTextNode    node
     when isCommentNode(node) then call emitCommentNode node
     when isCDATA(node)       then call emitCDATA       node
     otherwise                     call emitElementNode node
   end
-  g.!INDENT = g.!INDENT - g.!TAB
+  g.0INDENT = g.0INDENT - g.0TAB
 return
 
 setPreserveWhitespace: procedure expose g.
   parse arg bPreserve
-  g.!PRESERVEWS = bPreserve = 1
+  g.0PRESERVEWS = bPreserve = 1
 return
 
 emitTextNode: procedure expose g.
   parse arg node
-  if g.!PRESERVEWS = 1
+  if g.0PRESERVEWS = 1
   then call Say escapeText(getText(node))
   else call Say escapeText(removeWhitespace(getText(node)))
 return
@@ -2487,10 +2487,10 @@ return
 emitCDATA: procedure expose g.
   parse arg node
   sText = getText(node)
-  if g.!ENV = 'TSO'                                      /* 20070118 */
+  if g.0ENV = 'TSO'                                      /* 20070118 */
   then do
     do until length(sText) = 0
-      parse var sText sLine (g.!LF) sText
+      parse var sText sLine (g.0LF) sText
       call Say '<![CDATA['sLine']]>'
     end
   end
@@ -2527,15 +2527,15 @@ emitElementNode: procedure expose g.
     when nChildren = 1 then do
       child = children
       bIsCDATA = isCDATA(child)
-      if g.!YED_FRIENDLY = 1 & (isTextNode(child) | bIsCDATA)
+      if g.0YED_FRIENDLY = 1 & (isTextNode(child) | bIsCDATA)
       then do /* for yEd: <element attrs>text</element> */
         sText = toString(child)
-        if g.!OPTION.WRAP & pos(g.!LF,sText) > 0
+        if g.0OPTION.WRAP & pos(g.0LF,sText) > 0
         then do /* split lines into records */
-          parse var sText sLine (g.!LF) sText
+          parse var sText sLine (g.0LF) sText
           call emitElementAndAttributes node,'>'sLine
           do until length(sText) = 0
-            parse var sText sLine (g.!LF) sText
+            parse var sText sLine (g.0LF) sText
             if bIsCDATA
             then call Say sLine,0 /* suppress indentation */
             else call Say sLine
@@ -2575,9 +2575,9 @@ emitElementAndAttributes: procedure expose g.
   do i = 1 to nAttrs
     sAttr = getAttributeName(node,i)'="' ||,
             escapeText(getAttribute(node,i))'"'
-    nLineLength = g.!INDENT + length(sPad || sLine sAttr),
+    nLineLength = g.0INDENT + length(sPad || sLine sAttr),
                             + length(sTermination)
-    if g.!OPTION.WRAP & nLineLength > g.!OPTION.WRAP.1   /* 20070208 */
+    if g.0OPTION.WRAP & nLineLength > g.0OPTION.WRAP.1   /* 20070208 */
     then do
       call Say sPad || sLine
       sPad = copies(' ',length(sElement)+2)
@@ -2592,15 +2592,15 @@ Say: procedure expose g.
   parse arg sText,nIndent
   if nIndent <> ''
   then sLine = copies(' ',nIndent)sText /* temporary override */
-  else sLine = copies(' ',g.!INDENT)sText
-  if g.!ENV = 'TSO' & length(sLine) > g.!OPTION.WRAP.1   /* 20070208 */
+  else sLine = copies(' ',g.0INDENT)sText
+  if g.0ENV = 'TSO' & length(sLine) > g.0OPTION.WRAP.1   /* 20070208 */
   then do
     say 'JCL009W Line truncated:' strip(left(sText,50),'TRAILING')'...'
-    g.!LONGEST_LINE = max(g.!LONGEST_LINE,length(sLine))
+    g.0LONGEST_LINE = max(g.0LONGEST_LINE,length(sLine))
   end
-  if g.!FILEOUT = ''
+  if g.0FILEOUT = ''
   then say sLine
-  else call putLine g.!FILEOUT,sLine
+  else call putLine g.0FILEOUT,sLine
 return
 
 /*INCLUDE io.rex */

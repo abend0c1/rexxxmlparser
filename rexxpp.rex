@@ -83,26 +83,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **********************************************************************/
 
   parse arg sFileIn sFileOut' ('sOptions')'
-  parse source g.!SYSTEM .
-  if g.!SYSTEM = 'TSO'
+  parse source g.0SYSTEM .
+  if g.0SYSTEM = 'TSO'
   then do
     address ISPEXEC
     'CONTROL ERRORS RETURN'
-    g.!LINES = 0
+    g.0LINES = 0
     if sFileOut = ''
     then sFileOut = sFileIn /* you can do this on TSO but not Windows*/
   end
-  g.!LEVEL = 0
+  g.0LEVEL = 0
   parse value sourceline(1) with . sVersion
   call Say 'RPP000I Rexx INCLUDE Pre-processor' sVersion
   call Say 'RPP001I Output file is:' sFileOut
   sFileOut = getFile(sFileOut,'OUTPUT')
-  hFileOut = g.!hFile
-  if g.!rc = 0
+  hFileOut = g.0hFile
+  if g.0rc = 0
   then do
     call Say 'RPP001I Input file is:' sFileIn
     sFileIn = getFile(sFileIn)
-    hFileIn = g.!hFile
+    hFileIn = g.0hFile
     call includeFile sFileIn,hFileIn,hFileOut
   end
   else call Say 'RPP003E Could not create file:' sFileOut
@@ -116,7 +116,7 @@ exit
 
 Say: procedure expose g.
   parse arg sMessage
-  say copies(' ',g.!LEVEL)sMessage
+  say copies(' ',g.0LEVEL)sMessage
 return
 
 /*-------------------------------------------------------------------*
@@ -128,13 +128,13 @@ getFile: procedure expose g.
   if sFile <> ''
   then do
     sFile = strip(sFile)
-    g.!hFile = openFile(sFile,sMode)
-    do while g.!rc <> 0 & sFile <> ''
+    g.0hFile = openFile(sFile,sMode)
+    do while g.0rc <> 0 & sFile <> ''
       call Say 'RPP006E Could not open file:' sFile
       call Say 'RPP007A Enter full path to file:' sFile
       parse pull sFile
       if sFile <> ''
-      then g.!hFile = openFile(sFile,sMode)
+      then g.0hFile = openFile(sFile,sMode)
     end
   end
 return sFile
@@ -146,14 +146,14 @@ return sFile
 includeFile: procedure expose g.
   parse arg sFile,hFileIn,hFileOut
   if sFile = '' then return
-  g.!LEVEL = g.!LEVEL + 2
-  if g.!INCLUDED.sFile = 1                               /* 20050601 */
+  g.0LEVEL = g.0LEVEL + 2
+  if g.0INCLUDED.sFile = 1                               /* 20050601 */
   then call Say 'RPP005I Already included file:' sFile   /* 20050601 */
   else do                                                /* 20050601 */
-    g.!INCLUDED.sFile = 1                                /* 20050601 */
+    g.0INCLUDED.sFile = 1                                /* 20050601 */
     call Say 'RPP002I Including file:' sFile
     sLine = getLine(hFileIn)
-    do while g.!rc = 0
+    do while g.0rc = 0
       select
         when left(sLine,10) = '/*INCLUDE '
         then do
@@ -166,14 +166,14 @@ includeFile: procedure expose g.
           call exclude sFile,hFileIn
           call include sFile,hFileOut
         end
-        otherwise g.!rc = putLine(hFileOut,sLine)
+        otherwise g.0rc = putLine(hFileOut,sLine)
       end
       sLine = getLine(hFileIn)
     end
     rc = closeFile(hFileIn)
     call Say 'RRP004I Done.'
   end
-  g.!LEVEL = g.!LEVEL - 2
+  g.0LEVEL = g.0LEVEL - 2
 return
 
 /*-------------------------------------------------------------------*
@@ -184,12 +184,12 @@ include: procedure expose g.
   parse arg sFile,hFileOut
   sFile = strip(sFile)
   sFile = getFile(sFile) /* open it, else ask user */
-  hFileIn = g.!hFile
-  if g.!rc = 0
+  hFileIn = g.0hFile
+  if g.0rc = 0
   then do
-    g.!rc = putLine(hFileOut,'/*INCLUDED' sFile '*/')
+    g.0rc = putLine(hFileOut,'/*INCLUDED' sFile '*/')
     call includeFile sFile,hFileIn,hFileOut
-    g.!rc = putLine(hFileOut,'/*INCLUDEZ' sFile '*/')
+    g.0rc = putLine(hFileOut,'/*INCLUDEZ' sFile '*/')
   end
 return
 
@@ -200,7 +200,7 @@ return
 exclude: procedure expose g.
   parse arg sFile,hFileIn
   sFile = strip(sFile)
-  do until sFile = sFileIncluded | g.!rc <> 0
+  do until sFile = sFileIncluded | g.0rc <> 0
     sLine = getLine(hFileIn)
     if left(sLine,11) = '/*INCLUDEZ '
     then parse var sLine '/*INCLUDEZ' sFileIncluded '*/'
@@ -303,7 +303,7 @@ openFile: procedure expose g.
   parse arg sFile,sOptions,sAttrs
   hFile = ''
   select
-    when g.!ENV = 'TSO' then do
+    when g.0ENV = 'TSO' then do
       bOutput = wordpos('OUTPUT',sOptions) > 0
       bQuoted = left(sFile,1) = "'"
       if bQuoted then sFile = strip(sFile,,"'")
@@ -317,13 +317,13 @@ openFile: procedure expose g.
       then do /* Open a member of a PDS */
         'LMOPEN  DATAID(&hFile) OPTION(INPUT)' /* Input initially */
         /* ... can't update ISPF stats when opened for output */
-        g.!MEMBER.hFile = sMember
+        g.0MEMBER.hFile = sMember
         'LMMFIND DATAID(&hFile) MEMBER('sMember') STATS(YES)'
         if bOutput
         then do
           if rc = 0
-          then g.!STATS.hFile = zlvers','zlmod','zlc4date
-          else g.!STATS.hFile = '1,0,0000/00/00'
+          then g.0STATS.hFile = zlvers','zlmod','zlc4date
+          else g.0STATS.hFile = '1,0,0000/00/00'
           'LMCLOSE DATAID(&hFile)'
           'LMOPEN  DATAID(&hFile) OPTION(&sOptions)'
         end
@@ -336,7 +336,7 @@ openFile: procedure expose g.
           'LMFREE  DATAID(&hFile)'
           address TSO 'ALLOCATE DATASET('sFile') NEW CATALOG',
                       'SPACE(5,15) TRACKS RECFM(V,B)',
-                      'LRECL('g.!OPTION.WRAP.1 + 4')',
+                      'LRECL('g.0OPTION.WRAP.1 + 4')',
                       'BLKSIZE(27990)' sAttrs
           if bOutput
           then do
@@ -349,8 +349,8 @@ openFile: procedure expose g.
           end
         end
       end
-      g.!OPTIONS.hFile = sOptions
-      g.!rc = rc /* Return code from LMOPEN */
+      g.0OPTIONS.hFile = sOptions
+      g.0rc = rc /* Return code from LMOPEN */
     end
     otherwise do
       if wordpos('OUTPUT',sOptions) > 0
@@ -358,8 +358,8 @@ openFile: procedure expose g.
       else junk = stream(sFile,'COMMAND','OPEN READ')
       hFile = sFile
       if stream(sFile,'STATUS') = 'READY'
-      then g.!rc = 0
-      else g.!rc = 4
+      then g.0rc = 0
+      else g.0rc = 4
     end
   end
 return hFile
@@ -372,18 +372,18 @@ getLine: procedure expose g.
   parse arg hFile
   sLine = ''
   select
-    when g.!ENV = 'TSO' then do
+    when g.0ENV = 'TSO' then do
       'LMGET DATAID(&hFile) MODE(INVAR)',
             'DATALOC(sLine) DATALEN(nLine) MAXLEN(32768)'
-      g.!rc = rc
+      g.0rc = rc
       sLine = strip(sLine,'TRAILING')
       if sLine = '' then sLine = ' '
     end
     otherwise do
-      g.!rc = 0
+      g.0rc = 0
       if chars(hFile) > 0
       then sLine = linein(hFile)
-      else g.!rc = 4
+      else g.0rc = 4
     end
   end
 return sLine
@@ -395,8 +395,8 @@ return sLine
 putLine: procedure expose g.
   parse arg hFile,sLine
   select
-    when g.!ENV = 'TSO' then do
-      g.!LINES = g.!LINES + 1
+    when g.0ENV = 'TSO' then do
+      g.0LINES = g.0LINES + 1
       'LMPUT DATAID(&hFile) MODE(INVAR)',
             'DATALOC(sLine) DATALEN('length(sLine)')'
     end
@@ -415,13 +415,13 @@ closeFile: procedure expose g.
   parse arg hFile
   rc = 0
   select
-    when g.!ENV = 'TSO' then do
-      if g.!MEMBER.hFile <> '', /* if its a PDS */
-      & wordpos('OUTPUT',g.!OPTIONS.hFile) > 0 /* opened for output */
+    when g.0ENV = 'TSO' then do
+      if g.0MEMBER.hFile <> '', /* if its a PDS */
+      & wordpos('OUTPUT',g.0OPTIONS.hFile) > 0 /* opened for output */
       then do
         parse value date('STANDARD') with yyyy +4 mm +2 dd +2
-        parse var g.!STATS.hFile zlvers','zlmod','zlc4date
-        zlcnorc  = min(g.!LINES,65535)   /* Number of lines   */
+        parse var g.0STATS.hFile zlvers','zlmod','zlc4date
+        zlcnorc  = min(g.0LINES,65535)   /* Number of lines   */
         nVer = right(zlvers,2,'0')right(zlmod,2,'0')  /* vvmm */
         nVer = right(nVer+1,4,'0')       /* vvmm + 1          */
         parse var nVer zlvers +2 zlmod +2
@@ -430,7 +430,7 @@ closeFile: procedure expose g.
         zlm4date = yyyy'/'mm'/'dd        /* Modification date */
         zlmtime  = time()                /* Modification time */
         zluser   = userid()              /* Modification user */
-        'LMMREP DATAID(&hFile) MEMBER('g.!MEMBER.hFile') STATS(YES)'
+        'LMMREP DATAID(&hFile) MEMBER('g.0MEMBER.hFile') STATS(YES)'
       end
       'LMCLOSE DATAID(&hFile)'
       'LMFREE  DATAID(&hFile)'
