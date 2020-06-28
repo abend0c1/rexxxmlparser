@@ -1,6 +1,6 @@
 /*REXX 2.1.0
 
-Copyright (c) 2009, Andrew J. Armstrong
+Copyright (c) 2009-2020, Andrew J. Armstrong
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without 

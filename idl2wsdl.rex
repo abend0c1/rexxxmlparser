@@ -1,6 +1,5 @@
-/*REXX 2.0.0 $Rev$
-$Id$
-Copyright (c) 2009, Andrew J. Armstrong
+/*REXX 2.0.0
+Copyright (c) 2009-2020, Andrew J. Armstrong
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without 
