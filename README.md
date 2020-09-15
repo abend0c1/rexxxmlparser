@@ -317,7 +317,7 @@ listed below:
       `getPreviousSibling(node)`
 
          Returns the node number of the specified node's
-         previous sibline node. That is, the previous node
+         previous sibling node. That is, the previous node
          sharing the same parent.
 
       `getProcessingInstruction(name)`

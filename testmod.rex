@@ -63,7 +63,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ** HISTORY  - Date     By  Reason (most recent at the top pls)       **
 **            -------- --- ----------------------------------------- **
 **            20090822 AJA Changed from GPL to BSD license.          **
-**            20040707 AJA Intial version.                           **
+**            20040707 AJA Initial version.                          **
 **                                                                   **
 **********************************************************************/
 

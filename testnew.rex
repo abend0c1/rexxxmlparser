@@ -62,7 +62,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **            -------- --- ----------------------------------------- **
 **            20090822 AJA Changed from GPL to BSD license.          **
 **            20060803 AJA Added unit tests for getAttributeMap.     **
-**            20040707 AJA Intial version.                           **
+**            20040707 AJA Initial version.                          **
 **                                                                   **
 **********************************************************************/
 

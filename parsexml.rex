@@ -275,7 +275,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **                                                                   **
 **            getPreviousSibling(node)                               **
 **                Returns the node number of the specified node's    **
-**                previous sibline node. That is, the previous node  **
+**                previous sibling node. That is, the previous node  **
 **                sharing the same parent.                           **
 **                                                                   **
 **            getProcessingInstruction(name)                         **
@@ -503,7 +503,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **                         present in an attribute value.            **
 **                         Enhancement: DUMP option now displays     **
 **                         first part of each text node.             **
-**            20030901 AJA Intial version.                           **
+**            20030901 AJA Initial version.                          **
 **                                                                   **
 **********************************************************************/
 

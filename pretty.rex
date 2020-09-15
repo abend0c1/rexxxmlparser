@@ -78,7 +78,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **            20031031 AJA Fix escaping text.                        **
 **            20030911 AJA Removed default filename value. You       **
 **                         must specify your own filename.           **
-**            20030905 AJA Intial version.                           **
+**            20030905 AJA Initial version.                          **
 **                                                                   **
 **********************************************************************/
 

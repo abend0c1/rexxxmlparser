@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **                                                                   **
 **            This is the first step in creating stunning visual     **
 **            documentation of your JCL. GraphML (Graph Markup       **
-**            Language) is an XML standard for decribing the nodes   **
+**            Language) is an XML standard for describing the nodes  **
 **            and edges in a graph - in the mathematical sense.      **
 **            In plain English it describes boxes connected by lines **
 **            in a diagram.                                          **
@@ -136,7 +136,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **                                the source JCL line number.        **
 **                       ID     - Output _id attributes (a unique    **
 **                                id per element). This attribute is **
-**                                nameed '_id' so that it does not   **
+**                                named '_id' so that it does not    **
 **                                clash with the predefined 'id'     **
 **                                attribute in the XML specification.**
 **                                                                   **

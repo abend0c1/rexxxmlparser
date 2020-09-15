@@ -55,7 +55,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **            -------- --- ----------------------------------------- **
 **            20090822 AJA Changed from GPL to BSD license.          **
 **            20060803 AJA Added message number to messages.         **
-**            20050517 AJA Intial version.                           **
+**            20050517 AJA Initial version.                          **
 **                                                                   **
 **********************************************************************/
 

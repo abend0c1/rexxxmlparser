@@ -78,7 +78,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **            20050518 AJA Default fileout is filein (TSO only).     **
 **            20031217 AJA Allow output to be re-processed.          **
 **            20030912 AJA Use stream() to close win32 file.         **
-**            20030904 AJA Intial version.                           **
+**            20030904 AJA Initial version.                          **
 **                                                                   **
 **********************************************************************/
 
