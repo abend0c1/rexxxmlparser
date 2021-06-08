@@ -1,5 +1,7 @@
 # A REXX XML PARSER
 
+![the big picture](./images/lose-the-horse-luke.jpg)
+
 ## Function
 
 This is a Rexx XML parser that you can append to your
@@ -8,12 +10,13 @@ in-memory model and access the model via a DOM-like
 API.
 
 This version has been tested on:
+
 * z/OS v2.3 TSO (using TSO/REXX)
 * Windows (using Regina Rexx 3.9.1)
 * Linux (using Regina Rexx 3.9.1)
 
-
 ## Installation
+
    1. Copy the distribution library to your Rexx library.
 
    1. Execute the REXXPP INCLUDE pre-processor by running:
@@ -36,8 +39,8 @@ This version has been tested on:
    1. Repeat steps 2 and 3 for each of the other sample Rexx
       procedures if you want.
 
-
 ## Usage
+
    1. Initialize the parser by:
 
       `call initParser [options...]`
@@ -53,77 +56,92 @@ This version has been tested on:
    1. Navigate the in-memory model with the DOM API. For
       example:
 
-            say 'The document element is called',
-                                 getName(getDocumentElement())
-            say 'Children of the document element are:'
-            node = getFirstChild(getDocumentElement())
-            do while node <> ''
-               if isElementNode(node)
-               then say 'Element node:' getName(node)
-               else say '   Text node:' getText(node)
-               node = getNextSibling(node)
-            end
+      ```rexx
+      say 'The document element is called',
+                            getName(getDocumentElement())
+      say 'Children of the document element are:'
+      node = getFirstChild(getDocumentElement())
+      do while node <> ''
+          if isElementNode(node)
+          then say 'Element node:' getName(node)
+          else say '   Text node:' getText(node)
+          node = getNextSibling(node)
+      end
+      ```
 
    1. Optionally, destroy the in-memory model:
 
       `call destroyParser`
-
 
 ## Input
 
 The input to the parser consists of either an XML file or a string containing:
 
    1. An optional XML prolog:
-      - 0 or 1 XML declaration:
 
-               <?xml version="1.0" encoding="..." ...?>
+      * 0 or 1 XML declaration:
 
-      - 0 or more comments, PIs, and whitespace:
+        ```xml
+        <?xml version="1.0" encoding="..." ...?>
+        ```
 
-               <!-- a comment -->
-               <?target string?>
+      * 0 or more comments, Processing Instructions (PI's), and whitespace:
 
-      - 0 or 1 document type declaration. Formats:
+        ```xml
+        <!-- a comment -->
+        <?target string?>
+        ```
 
-               <!DOCTYPE root SYSTEM "sysid">
-               <!DOCTYPE root PUBLIC "pubid" SYSTEM "sysid">
-               <!DOCTYPE root [internal dtd]>
+      * 0 or 1 document type declaration. Formats:
+
+        ```xml
+        <!DOCTYPE root SYSTEM "sysid">
+        <!DOCTYPE root PUBLIC "pubid" SYSTEM "sysid">
+        <!DOCTYPE root [internal dtd]>
+        ```
 
    1. An XML body:
 
-      - 1 Document element containing 0 or more child
+      * 1 Document element containing 0 or more child
          elements. For example:
 
-               <doc attr1="value1" attr2="value2"...>
-                  Text of doc element
-                  <child1 attr1="value1">
-                  Text of child1 element
-                  </child1>
-                  More text of doc element
-                  <!-- an empty child element follows -->
-                  <child2/>
-                  Even more text of doc element
-               </doc>
+         ```xml
+         <doc attr1="value1" attr2="value2"...>
+           Text of doc element
+           <child1 attr1="value1">
+             Text of child1 element
+           </child1>
+           More text of doc element
+           <!-- an empty child element follows -->
+           <child2/>
+           Even more text of doc element
+         </doc>
+         ```
 
-      - Elements may contain:
+      * Elements may contain:
 
-         Unparsed character data:
+         * Unparsed character data:
 
-               <![CDATA[...unparsed data...]]>
-         
-         Entity references:
+         ```xml
+         <![CDATA[...unparsed data...]]>
+         ```
 
-               &name;
-         
-         Character references:
+         * Entity references:
 
-               &#nnnnn;
-               &#xXXXX;
+         ```xml
+         &name;
+         ```
+
+         * Character references:
+
+         ```xml
+         &#nnnnn;
+         &#xXXXX;
+         ```
 
    1. An XML epilog (which is ignored):
 
-      - 0 or more comments, Processing Instructions (PIs), and whitespace.
-
+      * 0 or more comments, Processing Instructions (PIs), and whitespace.
 
 ## Application Programming Interface
 
@@ -135,9 +153,11 @@ The input to the parser consists of either an XML file or a string containing:
          remembers any runtime options you specify. The
          options recognized are:
 
-            NOBLANKS - Suppress whitespace-only nodes
-            DEBUG    - Display some debugging info
-            DUMP     - Display the parse tree
+         | Option   | Meaning                        |
+         | -------- | ------------------------------ |
+         | NOBLANKS | Suppress whitespace-only nodes |
+         | DEBUG    | Display some debugging info    |
+         | DUMP     | Display the parse tree         |
 
       `parseFile(filename)`
 
@@ -187,7 +207,7 @@ listed below:
    1. Document query/navigation API calls
 
       `getRoot()`
-      
+
          Returns the node number of the root node. This
          can be used in calls requiring a node argument.
          In this implementation, `getDocumentElement()` and
@@ -223,10 +243,10 @@ listed below:
          node. The map can be accessed via the following
          variables:
 
-         | Variable | Content |
-         | --- | --- |
-         | g.0ATTRIBUTE.0 | The number of attributes mapped |
-         | g.0ATTRIBUTE.n | The name of attribute number `n` (in order of appearance). Where `n` > 0 |
+         | Variable          | Content                         |
+         | ----------------- | ------------------------------- |
+         | g.0ATTRIBUTE.0    | The number of attributes mapped |
+         | g.0ATTRIBUTE.n    | The name of attribute number `n` (in order of appearance) where `n` > 0 |
          | g.0ATTRIBUTE.name | The value of the attribute called `name` |
 
       `getAttributeName(node,n)`
@@ -289,12 +309,14 @@ listed below:
          the children of the specified node. You can use
          this list to step through the children as follows:
 
-            children = getChildren(node)
-            say 'Node' node 'has' words(children) 'children'
-            do i = 1 to words(children)
-               child = word(children,i)
-               say 'Node' child 'is' getName(child)
-            end
+         ```rexx
+         children = getChildren(node)
+         say 'Node' node 'has' words(children) 'children'
+         do i = 1 to words(children)
+           child = word(children,i)
+           say 'Node' child 'is' getName(child)
+         end
+         ```
 
       `getChildrenByName(node,name)`
 
@@ -336,21 +358,20 @@ listed below:
          type. The possible values can be compared to the
          following global variables:
 
-
-         | Variable | Content |
-         | --- | --- |
-         |   g.0ELEMENT_NODE                | 1 |
-         |   g.0ATTRIBUTE_NODE              | 2 |
-         |   g.0TEXT_NODE                   | 3 |
-         |   g.0CDATA_SECTION_NODE          | 4 |
-         |   g.0ENTITY_REFERENCE_NODE       | 5 |
-         |   g.0ENTITY_NODE                 | 6 |
-         |   g.0PROCESSING_INSTRUCTION_NODE | 7 |
-         |   g.0COMMENT_NODE                | 8 |
-         |   g.0DOCUMENT_NODE               | 9 |
-         |   g.0DOCUMENT_TYPE_NODE          | 10 |
-         |   g.0DOCUMENT_FRAGMENT_NODE      | 11 |
-         |   g.0NOTATION_NODE               | 12 |
+         | Variable                       | Content |
+         | ------------------------------ | ------- |
+         | g.0ELEMENT_NODE                | 1       |
+         | g.0ATTRIBUTE_NODE              | 2       |
+         | g.0TEXT_NODE                   | 3       |
+         | g.0CDATA_SECTION_NODE          | 4       |
+         | g.0ENTITY_REFERENCE_NODE       | 5       |
+         | g.0ENTITY_NODE                 | 6       |
+         | g.0PROCESSING_INSTRUCTION_NODE | 7       |
+         | g.0COMMENT_NODE                | 8       |
+         | g.0DOCUMENT_NODE               | 9       |
+         | g.0DOCUMENT_TYPE_NODE          | 10      |
+         | g.0DOCUMENT_FRAGMENT_NODE      | 11      |
+         | g.0NOTATION_NODE               | 12      |
 
          Note: as this exposes internal implementation
          details, it is best not to use this routine.
@@ -477,36 +498,38 @@ listed below:
       any of them accidentally (or on purpose). The
       variables you should avoid updating yourself are:
 
-            g.0ATTRIBUTE.n
-            g.0ATTRIBUTE.name
-            g.0ATTRSOK
-            g.0DTD
-            g.0ENDOFDOC
-            g.0ENTITIES
-            g.0ENTITY.name
-            g.0FIRST.n
-            g.0LAST.n
-            g.0NAME.n
-            g.0NEXT.n
-            g.0NEXTID
-            g.0OPTION.name
-            g.0OPTIONS
-            g.0PARENT.n
-            g.0PI
-            g.0PI.name
-            g.0PREV.n
-            g.0PUBLIC
-            g.0ROOT
-            g.0STACK
-            g.0SYSTEM
-            g.0TEXT.n
-            g.0TYPE.n
-            g.0WHITESPACE
-            g.0XML
-            g.?XML
-            g.?XML.VERSION
-            g.?XML.ENCODING
-            g.?XML.STANDALONE
+      | REXX Variable     |
+      | ----------------- |
+      | g.0ATTRIBUTE.n    |
+      | g.0ATTRIBUTE.name |
+      | g.0ATTRSOK        |
+      | g.0DTD            |
+      | g.0ENDOFDOC       |
+      | g.0ENTITIES       |
+      | g.0ENTITY.name    |
+      | g.0FIRST.n        |
+      | g.0LAST.n         |
+      | g.0NAME.n         |
+      | g.0NEXT.n         |
+      | g.0NEXTID         |
+      | g.0OPTION.name    |
+      | g.0OPTIONS        |
+      | g.0PARENT.n       |
+      | g.0PI             |
+      | g.0PI.name        |
+      | g.0PREV.n         |
+      | g.0PUBLIC         |
+      | g.0ROOT           |
+      | g.0STACK          |
+      | g.0SYSTEM         |
+      | g.0TEXT.n         |
+      | g.0TYPE.n         |
+      | g.0WHITESPACE     |
+      | g.0XML            |
+      | g.?XML            |
+      | g.?XML.VERSION    |
+      | g.?XML.ENCODING   |
+      | g.?XML.STANDALONE |
 
    1. To reduce the incidence of name clashes, procedure
       names that are not meant to be part of the public
